@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="Content-Security-Policy" content="frame-ancestors 'self' https://sqlnot.github.io;">
+    <meta http-equiv="Content-Security-Policy" content="frame-ancestors 'self' https://xsakanoooooo.github.io https://player.twitch.tv;">
     <title>Streamy GTA V</title>
     <style>
         /* Globalne style */
@@ -11,119 +11,139 @@
             font-family: 'Arial', sans-serif;
             margin: 0;
             padding: 0;
-            background-color: #121212;
-            color: #e5e5e5;
+            background-color: #0b0b0b;
+            color: #e0e0e0;
             display: flex;
             height: 100vh;
             flex-direction: column;
+        }
+
+        /* Animacja LED */
+        @keyframes led-glow {
+            0%, 100% {
+                box-shadow: 0 0 10px #f44336, 0 0 20px #f44336, 0 0 30px #f44336;
+            }
+            50% {
+                box-shadow: 0 0 5px #f44336, 0 0 10px #f44336, 0 0 15px #f44336;
+            }
         }
 
         /* Nagłówek */
         h1 {
             text-align: center;
             margin: 20px 0;
-            font-size: 2em;
-            color: #e53e3e;
+            font-size: 3em;
+            color: #f44336;
             font-weight: bold;
             text-transform: uppercase;
+            width: 100%;
+            animation: led-glow 1.5s infinite alternate;
         }
 
         /* Kontener główny */
         .main-container {
             display: flex;
-            flex-grow: 1;
             width: 100%;
+            flex-grow: 1;
+            background-color: #121212;
+            border-radius: 15px;
+            padding: 15px;
+            box-shadow: 0px 0px 15px #000;
+            gap: 15px;
         }
 
         /* Panel boczny */
         .sidebar {
-            width: 250px;
-            background-color: #1e1e1e;
-            padding: 10px;
+            width: 300px;
+            background-color: #1f1f1f;
+            padding: 20px;
             height: 100%;
             overflow-y: auto;
-            border-right: 2px solid #333;
-            box-sizing: border-box;
+            border-radius: 10px;
+            box-shadow: inset 0 0 10px #333;
         }
 
         /* Kafelki streamów */
         .stream-sidebar-item {
-            background-color: #2b2b2b;
+            background: linear-gradient(145deg, #292929, #232323);
             border-radius: 10px;
-            padding: 12px;
-            margin-bottom: 12px;
+            padding: 15px;
+            margin-bottom: 15px;
             display: flex;
             align-items: center;
             cursor: pointer;
-            transition: background-color 0.3s ease, transform 0.2s ease;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
         }
 
         .stream-sidebar-item:hover {
-            background-color: #444;
             transform: scale(1.05);
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.6);
+            background: linear-gradient(145deg, #333, #2a2a2a);
         }
 
         .stream-sidebar-item img {
-            width: 50px;
-            height: 50px;
+            width: 60px;
+            height: 60px;
             border-radius: 50%;
-            margin-right: 12px;
+            margin-right: 15px;
         }
 
         .stream-sidebar-item .info {
-            color: #fff;
+            color: #f1f1f1;
             display: flex;
             flex-direction: column;
-            justify-content: center;
         }
 
         .stream-sidebar-item .info strong {
-            font-size: 1.1em;
-            margin-bottom: 4px;
+            font-size: 1.2em;
+            color: #f8f8f8;
         }
 
         .stream-sidebar-item .info p {
-            font-size: 0.9em;
-            color: #bbb;
+            font-size: 1em;
+            color: #aaa;
         }
 
         /* Kontener na player i chat */
         .main-content {
             display: flex;
+            flex-direction: column;
             flex-grow: 1;
-            padding: 20px;
-            background-color: #1e1e1e;
-            box-sizing: border-box;
+            align-items: center;
+            justify-content: center;
             gap: 10px;
         }
 
         /* Player streamu */
         #streamViewer {
-            flex: 3;
-            aspect-ratio: 16 / 9; /* Proporcje 16:9 */
             width: 100%;
+            max-width: 900px;
+            height: 506px; /* Proporcje 16:9 */
             border: none;
-            background-color: #000;
-            border-radius: 10px;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+            border-radius: 15px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.5);
+            transition: box-shadow 0.3s ease;
         }
 
-        /* Chat */
+        #streamViewer:hover {
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.7);
+        }
+
+        /* Chat Twitcha */
         #chatViewer {
-            flex: 1;
-            height: auto;
+            width: 100%;
+            max-width: 300px;
+            height: 506px;
             border: none;
-            background-color: #000;
-            border-radius: 10px;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+            border-radius: 15px;
+            background-color: #0b0b0b;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.5);
+            transition: box-shadow 0.3s ease;
         }
 
-        /* Komunikaty o braku streamów */
-        #streamList p {
-            font-size: 1.2em;
-            color: #e53e3e;
-            text-align: center;
+        #chatViewer:hover {
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.7);
         }
     </style>
 </head>
@@ -134,26 +154,26 @@
 <div class="main-container">
     <!-- Panel boczny -->
     <div id="sidebar" class="sidebar">
-        <p>Wybierz stream</p>
+        <p style="font-size: 1.3em; color: #f8f8f8;">Wybierz stream</p>
     </div>
 
-    <!-- Kontener na player i chat -->
+    <!-- Kontener na stream i chat -->
     <div class="main-content">
-        <iframe id="streamViewer" src="" title="Stream Player" frameborder="0"></iframe>
-        <iframe id="chatViewer" src="" title="Stream Chat" frameborder="0"></iframe>
+        <iframe id="streamViewer" src="" title="Stream" frameborder="0"></iframe>
+        <iframe id="chatViewer" src="" title="Chat" frameborder="0"></iframe>
     </div>
 </div>
 
 <script>
 // Twitch API credentials
-const clientId = 'ffo830okw5x9tcbt51c2wpjhr80jnn';  // Twoje Client ID
-const oauthToken = 'sh4ly28ldx12keykw0iedo0y5ellu9';  // Twój OAuth Token
-const gameId = '32982'; // ID gry GTA V (potwierdzone w API Twitcha)
+const clientId = 'ffo830okw5x9tcbt51c2wpjhr80jnn';
+const oauthToken = 'sh4ly28ldx12keykw0iedo0y5ellu9';
+const gameId = '32982';
 
 let isLoading = false;
 let hasMoreStreams = true;
 
-// Funkcja do przycinania tytułu
+// Funkcja do przycinania tytułu do pierwszych 100 znaków
 function truncateTitle(title) {
     return title.length > 100 ? title.substring(0, 100) + '...' : title;
 }
@@ -185,7 +205,7 @@ async function getStreams(cursor = '') {
 
         if (data.data && data.data.length > 0) {
             const sidebar = document.getElementById('sidebar');
-            sidebar.innerHTML = '<p>Wybierz stream</p>';
+            sidebar.innerHTML = '<p style="font-size: 1.3em; color: #f8f8f8;">Wybierz stream</p>';
 
             data.data.forEach(stream => {
                 const streamSidebarItem = document.createElement('div');
@@ -193,7 +213,7 @@ async function getStreams(cursor = '') {
                 streamSidebarItem.onclick = () => openStream(stream.user_name);
 
                 streamSidebarItem.innerHTML = `
-                    <img src="${stream.thumbnail_url.replace('{width}', '50').replace('{height}', '50')}" alt="${stream.user_name}">
+                    <img src="${stream.thumbnail_url.replace('{width}', '80').replace('{height}', '80')}" alt="${stream.user_name}">
                     <div class="info">
                         <strong>${stream.user_name}</strong>
                         <p>${stream.viewer_count} widzów</p>
@@ -221,8 +241,8 @@ async function getStreams(cursor = '') {
 
 // Funkcja otwierająca stream i chat
 function openStream(username) {
-    document.getElementById('streamViewer').src = `https://player.twitch.tv/?channel=${username}&parent=sqlnot.github.io&autoplay=true`;
-    document.getElementById('chatViewer').src = `https://www.twitch.tv/embed/${username}/chat?parent=sqlnot.github.io`;
+    document.getElementById('streamViewer').src = `https://player.twitch.tv/?channel=${username}&parent=xsakanoooooo.github.io&autoplay=true`;
+    document.getElementById('chatViewer').src = `https://www.twitch.tv/embed/${username}/chat?parent=xsakanoooooo.github.io`;
 }
 
 // Inicjalizacja
