@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Content-Security-Policy" content="frame-ancestors 'self' https://sqlnot.github.io;">
+    <title>Streamy GTA V</title>
+    <style>
+        /* Globalne style */
+        body {
+            font-family: 'Arial', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #121212;
+            color: #e5e5e5;
+            display: flex;
+            height: 100vh;
+            flex-direction: column;
+        }
+
+        /* Nagłówek */
+        h1 {
+            text-align: center;
+            margin: 20px 0;
+            font-size: 2em;
+            color: #e53e3e;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+
+        /* Kontener główny */
+        .main-container {
+            display: flex;
+            flex-grow: 1;
+            width: 100%;
+        }
+
+        /* Panel boczny */
+        .sidebar {
+            width: 250px;
+            background-color: #1e1e1e;
+            padding: 10px;
+            height: 100%;
+            overflow-y: auto;
+            border-right: 2px solid #333;
+            box-sizing: border-box;
+        }
+
+        /* Kafelki streamów */
+        .stream-sidebar-item {
+            background-color: #2b2b2b;
+            border-radius: 10px;
+            padding: 12px;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .stream-sidebar-item:hover {
+            background-color: #444;
+            transform: scale(1.05);
+        }
+
+        .stream-sidebar-item img {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            margin-right: 12px;
+        }
+
+        .stream-sidebar-item .info {
+            color: #fff;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .stream-sidebar-item .info strong {
+            font-size: 1.1em;
+            margin-bottom: 4px;
+        }
+
+        .stream-sidebar-item .info p {
+            font-size: 0.9em;
+            color: #bbb;
+        }
+
+        /* Kontener na player i chat */
+        .main-content {
+            display: flex;
+            flex-grow: 1;
+            padding: 20px;
+            background-color: #1e1e1e;
+            box-sizing: border-box;
+            gap: 10px;
+        }
+
+        /* Player streamu */
+        #streamViewer {
+            flex: 3;
+            aspect-ratio: 16 / 9; /* Proporcje 16:9 */
+            width: 100%;
+            border: none;
+            background-color: #000;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+        }
+
+        /* Chat */
+        #chatViewer {
+            flex: 1;
+            height: auto;
+            border: none;
+            background-color: #000;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+        }
+
+        /* Komunikaty o braku streamów */
+        #streamList p {
+            font-size: 1.2em;
+            color: #e53e3e;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+
+<h1>Streamy GTA V</h1>
+
+<div class="main-container">
+    <!-- Panel boczny -->
+    <div id="sidebar" class="sidebar">
+        <p>Wybierz stream</p>
+    </div>
+
+    <!-- Kontener na player i chat -->
+    <div class="main-content">
+        <iframe id="streamViewer" src="" title="Stream Player" frameborder="0"></iframe>
+        <iframe id="chatViewer" src="" title="Stream Chat" frameborder="0"></iframe>
+    </div>
+</div>
+
+<script>
+// Twitch API credentials
+const clientId = 'ffo830okw5x9tcbt51c2wpjhr80jnn';  // Twoje Client ID
+const oauthToken = 'sh4ly28ldx12keykw0iedo0y5ellu9';  // Twój OAuth Token
+const gameId = '32982'; // ID gry GTA V (potwierdzone w API Twitcha)
+
+let isLoading = false;
+let hasMoreStreams = true;
+
+// Funkcja do przycinania tytułu
+function truncateTitle(title) {
+    return title.length > 100 ? title.substring(0, 100) + '...' : title;
+}
+
+// Pobieranie streamów
+async function getStreams(cursor = '') {
+    if (isLoading || !hasMoreStreams) return;
+    isLoading = true;
+
+    const url = cursor
+        ? `https://api.twitch.tv/helix/streams?game_id=${gameId}&first=100&after=${cursor}&language=pl`
+        : `https://api.twitch.tv/helix/streams?game_id=${gameId}&first=100&language=pl`;
+
+    try {
+        const response = await fetch(url, {
+            headers: {
+                'Client-ID': clientId,
+                'Authorization': `Bearer ${oauthToken}`
+            }
+        });
+
+        if (!response.ok) {
+            console.error('Błąd zapytania API:', response.status, response.statusText);
+            document.getElementById('sidebar').innerHTML = '<p>Wystąpił błąd podczas pobierania streamów.</p>';
+            return;
+        }
+
+        const data = await response.json();
+
+        if (data.data && data.data.length > 0) {
+            const sidebar = document.getElementById('sidebar');
+            sidebar.innerHTML = '<p>Wybierz stream</p>';
+
+            data.data.forEach(stream => {
+                const streamSidebarItem = document.createElement('div');
+                streamSidebarItem.classList.add('stream-sidebar-item');
+                streamSidebarItem.onclick = () => openStream(stream.user_name);
+
+                streamSidebarItem.innerHTML = `
+                    <img src="${stream.thumbnail_url.replace('{width}', '50').replace('{height}', '50')}" alt="${stream.user_name}">
+                    <div class="info">
+                        <strong>${stream.user_name}</strong>
+                        <p>${stream.viewer_count} widzów</p>
+                    </div>
+                `;
+
+                sidebar.appendChild(streamSidebarItem);
+            });
+
+            if (data.pagination && data.pagination.cursor) {
+                getStreams(data.pagination.cursor);
+            } else {
+                hasMoreStreams = false;
+            }
+        } else {
+            document.getElementById('sidebar').innerHTML = '<p>Brak streamów w kategorii GTA V.</p>';
+        }
+    } catch (error) {
+        console.error('Błąd podczas pobierania streamów:', error);
+        document.getElementById('sidebar').innerHTML = '<p>Wystąpił błąd podczas pobierania danych.</p>';
+    } finally {
+        isLoading = false;
+    }
+}
+
+// Funkcja otwierająca stream i chat
+function openStream(username) {
+    document.getElementById('streamViewer').src = `https://player.twitch.tv/?channel=${username}&parent=sqlnot.github.io&autoplay=true`;
+    document.getElementById('chatViewer').src = `https://www.twitch.tv/embed/${username}/chat?parent=sqlnot.github.io`;
+}
+
+// Inicjalizacja
+window.onload = () => getStreams();
+</script>
+
+</body>
+</html>
