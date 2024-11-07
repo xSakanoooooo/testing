@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="Content-Security-Policy" content="frame-ancestors 'self' https://xsakanoooooo.github.io https://player.twitch.tv;">
+    <meta http-equiv="Content-Security-Policy" content="frame-ancestors 'self' https://sqlnot.github.io https://player.twitch.tv;">
     <title>Streamy GTA V</title>
     <style>
         /* Globalne style */
@@ -11,25 +11,14 @@
             font-family: 'Arial', sans-serif;
             margin: 0;
             padding: 0;
-            background-color: #121212;  /* Ciemne tło */
-            color: #e5e5e5;  /* Jasnoszary tekst */
+            background-color: #121212;
+            color: #e5e5e5;
             display: flex;
             height: 100vh;
             flex-direction: column;
         }
 
-        /* Nagłówek */
-        h1 {
-            text-align: center;
-            margin: 40px 0;
-            font-size: 3em;
-            color: #e53e3e;  /* Czerwony kolor nagłówka */
-            font-weight: bold;
-            text-transform: uppercase;
-            width: 100%;
-        }
-
-        /* Kontener z dwiema kolumnami */
+        /* Kontener główny */
         .main-container {
             display: flex;
             width: 100%;
@@ -38,113 +27,187 @@
 
         /* Panel boczny */
         .sidebar {
-            width: 250px;
+            width: 200px;
             background-color: #1e1e1e;
-            padding: 15px;
+            padding: 10px;
             height: 100%;
             overflow-y: auto;
             border-right: 2px solid #333;
             box-sizing: border-box;
+            transition: width 0.3s ease;
         }
 
         /* Kafelki streamów w panelu bocznym */
         .stream-sidebar-item {
-            background-color: #2b2b2b;
-            border-radius: 10px;
-            padding: 15px;
-            margin-bottom: 15px;
+            position: relative;
+            width: 100%;
+            height: 128px;
+            background: rgba(203, 32, 60, 0.08);
+            border: 5px solid #CB203C;
+            filter: blur(8px);
+            border-radius: 100px;
             display: flex;
             align-items: center;
-            justify-content: space-between;
+            margin-bottom: 15px;
+            padding: 10px;
+            box-sizing: border-box;
             cursor: pointer;
-            transition: background-color 0.3s ease, transform 0.2s ease;
+            transition: transform 0.2s ease;
         }
 
         .stream-sidebar-item:hover {
-            background-color: #444;
             transform: scale(1.05);
         }
 
-        /* Avatar i info o streamie */
-        .stream-sidebar-item img {
-            width: 50px;
-            height: 50px;
+        /* Stylizacja dla obrazka */
+        .stream-sidebar-item .stream-avatar {
+            width: 58px;
+            height: 58px;
+            border-radius: 20px;
+            background-color: #FFFFFF; /* Domyślny kolor, jeśli obrazek się nie załaduje */
+            margin-right: 10px;
+        }
+
+        /* Stylizacja dla nazwy użytkownika */
+        .stream-sidebar-item .nick {
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 600;
+            font-size: 28px;
+            line-height: 34px;
+            color: #FFFFFF;
+            flex-grow: 1;
+            text-align: left;
+            margin-left: 10px;
+        }
+
+        /* Czerwona kropka dla liczby widzów */
+        .stream-sidebar-item .viewer-badge {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            width: 14px;
+            height: 14px;
             border-radius: 50%;
-            margin-right: 15px;
+            background-color: #CB203C;
         }
 
-        .stream-sidebar-item .info {
-            color: #fff;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            flex-grow: 1;
+        /* Liczba widzów */
+        .stream-sidebar-item .viewers-count {
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 600;
+            font-size: 25px;
+            line-height: 30px;
+            color: #FFFFFF;
+            position: absolute;
+            bottom: 15px;
+            right: 20px;
         }
 
-        .stream-sidebar-item .info strong {
-            font-size: 1.2em;
-            color: #f1f1f1;
-        }
-
-        .stream-sidebar-item .info p {
-            font-size: 1em;
-            color: #bbb;
-        }
-
-        /* Kontener dla streamu */
+        /* Kontener na stream i czat */
         .main-content {
-            flex-grow: 1;
-            background-color: #1e1e1e;
             display: flex;
             justify-content: center;
             align-items: center;
-            box-sizing: border-box;
+            gap: 10px;
+            width: calc(100% - 200px);
+            margin-left: auto;
+            margin-right: auto;
             padding: 20px;
+            box-sizing: border-box;
+            background-color: #1e1e1e;
+            transition: width 0.3s ease;
         }
 
         /* Iframe dla streamu */
         #streamViewer {
-            width: 100%;
-            max-width: 1280px;
-            height: 720px; /* Proporcje 16:9 */
+            width: 78%;
+            height: 730px;
             border: none;
             border-radius: 10px;
         }
 
-        /* Komunikaty o braku streamów */
-        #streamList p {
-            font-size: 1.5em;
-            color: #e53e3e;
-            text-align: center;
+        /* Iframe dla czatu */
+        #chatViewer {
+            width: 20%;
+            height: 730px;
+            border: none;
+            border-radius: 10px;
         }
+
+        /* Przyciski chowania panelu bocznego */
+        .toggle-sidebar {
+            position: relative;
+            top: 20px;
+            background-color: #1e1e1e;
+            border: none;
+            color: #e5e5e;
+            padding: 10px;
+            cursor: pointer;
+            border-radius: 5px;
+            z-index: 10;
+            margin-top: 20px;
+            width: 100%;
+        }
+
+        .toggle-sidebar:hover {
+            background-color: #444;
+        }
+
+        /* Po zwinięciu panelu bocznego */
+        .sidebar.collapsed {
+            width: 60px;
+        }
+
+        .sidebar.collapsed .stream-sidebar-item {
+            justify-content: center;
+        }
+
+        .sidebar.collapsed .stream-sidebar-item .info {
+            display: none;
+        }
+
+        .main-content.expanded {
+            width: 100%;
+        }
+
     </style>
 </head>
 <body>
 
-<h1>Streamy GTA V</h1>
-
 <div class="main-container">
     <!-- Panel boczny -->
     <div id="sidebar" class="sidebar">
-        <p style="font-size: 1.3em; color: #f1f1f1;">Wybierz stream</p>
+        <p style="font-size: 1.2em; color: #f1f1f1;">Wybierz stream</p>
+        <!-- Lista streamów -->
     </div>
 
-    <!-- Kontener na stream -->
-    <div class="main-content">
+    <!-- Kontener na stream i czat -->
+    <div id="mainContent" class="main-content">
         <iframe id="streamViewer" src="" title="Stream" frameborder="0"></iframe>
+        <iframe id="chatViewer" src="" title="Chat" frameborder="0"></iframe>
     </div>
 </div>
 
+<!-- Przycisk do chowania/zamykania panelu bocznego -->
+<button class="toggle-sidebar" onclick="toggleSidebar()">⬅</button>
+
 <script>
+// Funkcja do chowania i pokazywania panelu bocznego
+function toggleSidebar() {
+    const sidebar = document.getElementById('sidebar');
+    const mainContent = document.getElementById('mainContent');
+    sidebar.classList.toggle('collapsed');
+    mainContent.classList.toggle('expanded');
+}
+
 // Twitch API credentials
-const clientId = 'ffo830okw5x9tcbt51c2wpjhr80jnn';  // Twoje Client ID
-const oauthToken = 'sh4ly28ldx12keykw0iedo0y5ellu9';  // Twój OAuth Token
-const gameId = '32982'; // ID gry GTA V (potwierdzone w API Twitcha)
+const clientId = 'ffo830okw5x9tcbt51c2wpjhr80jnn';
+const oauthToken = 'sh4ly28ldx12keykw0iedo0y5ellu9';
+const gameId = '32982';
 
-let isLoading = false; // Flaga do zapobiegania wielokrotnemu ładowaniu w tym samym czasie
-let hasMoreStreams = true; // Flaga, która kontroluje, czy są dostępne kolejne streamy
+let isLoading = false;
+let hasMoreStreams = true;
 
-// Funkcja do przycinania tytułu do pierwszych 100 znaków
 function truncateTitle(title) {
     if (title.length > 100) {
         return title.substring(0, 100) + '...';
@@ -152,16 +215,14 @@ function truncateTitle(title) {
     return title;
 }
 
-// Funkcja do pobrania streamów
 async function getStreams(cursor = '') {
-    if (isLoading || !hasMoreStreams) return;  // Sprawdzamy, czy już ładowaliśmy lub czy nie ma więcej streamów
+    if (isLoading || !hasMoreStreams) return;
 
-    isLoading = true; // Ustawiamy flagę na true, aby zapobiec wielokrotnemu ładowaniu
+    isLoading = true;
 
-    // Zwiększenie liczby streamów na stronę (do 100)
     const url = cursor
-        ? `https://api.twitch.tv/helix/streams?game_id=${gameId}&first=100&after=${cursor}&language=pl`  // Dodanie paginacji i filtrowanie po języku "pl"
-        : `https://api.twitch.tv/helix/streams?game_id=${gameId}&first=100&language=pl`;  // Więcej streamów w pierwszym zapytaniu
+        ? `https://api.twitch.tv/helix/streams?game_id=${gameId}&first=100&after=${cursor}&language=pl`
+        : `https://api.twitch.tv/helix/streams?game_id=${gameId}&first=100&language=pl`;
 
     try {
         const response = await fetch(url, {
@@ -171,7 +232,6 @@ async function getStreams(cursor = '') {
             }
         });
 
-        // Sprawdzamy, czy odpowiedź API jest poprawna
         if (!response.ok) {
             console.error('Błąd zapytania API:', response.status, response.statusText);
             document.getElementById('streamList').innerHTML = '<p>Wystąpił błąd podczas pobierania streamów.</p>';
@@ -181,63 +241,48 @@ async function getStreams(cursor = '') {
         const data = await response.json();
 
         if (data.data && data.data.length > 0) {
-            // Filtrowanie streamów po tytule zawierającym wybrane frazy
-            const filteredStreams = data.data.filter(stream => {
-                const title = stream.title.toLowerCase();  // Zmieniamy tytuł na małe litery, aby porównanie było niewrażliwe na wielkość liter
-                return /infamespl|infames polska|infames pl|infames/.test(title);  // Wyrażenie regularne sprawdzające wszystkie frazy
-            });
-
-            // Jeśli nie ma streamów po filtracji
-            if (filteredStreams.length === 0) {
-                if (!cursor) {  // Tylko raz, przy pierwszym ładowaniu, gdy brak wyników
-                    document.getElementById('streamList').innerHTML = '<p>Brak streamów z odpowiednimi tytułami w kategorii GTA V.</p>';
-                }
-                return;
-            }
-
             const sidebar = document.getElementById('sidebar');
-            sidebar.innerHTML = ''; // Czyścimy poprzednie wyniki
+            sidebar.innerHTML = '';
 
-            // Wyświetl streamy w panelu bocznym
-            filteredStreams.forEach(stream => {
+            data.data.forEach(stream => {
                 const streamSidebarItem = document.createElement('div');
                 streamSidebarItem.classList.add('stream-sidebar-item');
                 streamSidebarItem.onclick = () => openStream(stream.user_name);
 
                 streamSidebarItem.innerHTML = `
-                    <img src="${stream.thumbnail_url.replace('{width}', '80').replace('{height}', '80')}" alt="${stream.user_name}">
-                    <div class="info">
-                        <strong>${stream.user_name}</strong>
-                        <p>${stream.viewer_count} widzów</p>
-                    </div>
+                    <img class="stream-avatar" src="${stream.thumbnail_url.replace('{width}', '80').replace('{height}', '80')}" alt="${stream.user_name}">
+                    <div class="nick">${stream.user_name}</div>
+                    <div class="viewer-badge"></div>
+                    <div class="viewers-count">${stream.viewer_count} widzów</div>
                 `;
-
                 sidebar.appendChild(streamSidebarItem);
             });
 
-            // Jeśli jest kolejna strona, zapisz kursor i wezwij kolejne streamy
-            if (data.pagination && data.pagination.cursor) {
-                getStreams(data.pagination.cursor);  // Rekursywnie pobierz kolejne strony
-            } else {
-                hasMoreStreams = false;  // Nie ma więcej streamów
+            hasMoreStreams = !!data.pagination.cursor;
+            if (hasMoreStreams) {
+                getStreams(data.pagination.cursor);
             }
         } else {
-            document.getElementById('streamList').innerHTML = '<p>Brak streamów w kategorii GTA V.</p>';
+            document.getElementById('sidebar').innerHTML = '<p>Brak streamów w kategorii GTA V.</p>';
         }
     } catch (error) {
         console.error('Błąd podczas pobierania streamów:', error);
-        document.getElementById('streamList').innerHTML = '<p>Wystąpił błąd podczas pobierania danych.</p>';
+        document.getElementById('sidebar').innerHTML = '<p>Wystąpił błąd podczas pobierania danych.</p>';
     } finally {
-        isLoading = false;  // Ustawiamy flagę na false, aby umożliwić następne ładowanie
+        isLoading = false;
     }
 }
 
-// Funkcja otwierająca stream w centralnej części ekranu
 function openStream(username) {
     const iframe = document.getElementById('streamViewer');
-    iframe.src = `https://player.twitch.tv/?channel=${username}&parent=xsakanoooooo.github.io&autoplay=true`;
-}
+    const chatIframe = document.getElementById('chatViewer');
 
+    // Ustawiamy iframe dla streamu
+    iframe.src = `https://player.twitch.tv/?channel=${username}&parent=sqlnot.github.io&autoplay=true`;
+
+    // Ustawiamy iframe dla czatu z ciemnym motywem
+    chatIframe.src = `https://www.twitch.tv/embed/${username}/chat?parent=sqlnot.github.io&darkpopout`;
+}
 
 // Wywołaj funkcję pobierającą streamy po załadowaniu strony
 window.onload = () => getStreams();
