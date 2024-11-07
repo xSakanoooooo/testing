@@ -6,191 +6,223 @@
     <meta http-equiv="Content-Security-Policy" content="frame-ancestors 'self' https://sqlnot.github.io https://player.twitch.tv;">
     <title>Streamy GTA V</title>
     <style>
-    body {
-        display: flex;
-        justify-content: flex-start;
-        margin: 0;
-        padding: 0;
-        font-family: Arial, sans-serif;
-        background-color: #1c1c1c;
-        color: #fff;
-    }
+        /* Global Styles */
+        body {
+            font-family: 'Arial', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #121212;
+            color: #e5e5e5;
+            display: flex;
+            height: 100vh;
+            flex-direction: column;
+        }
 
-    #streamSidebar {
-        width: 300px; /* Zwiększ szerokość paska bocznego */
-        padding: 10px;
-        background-color: #1c1c1c;
-        overflow-y: auto;
-        height: 100vh;
-        box-sizing: border-box;
-    }
+        /* Header */
+        h1 {
+            text-align: center;
+            margin: 40px 0;
+            font-size: 3em;
+            color: #e53e3e;
+            font-weight: bold;
+            text-transform: uppercase;
+            width: 100%;
+        }
 
-    .stream-sidebar-item {
-        display: flex;
-        align-items: center;
-        padding: 8px;
-        margin: 10px 0;
-        border-radius: 12px;
-        background-color: rgba(255, 0, 0, 0.2); /* Lekki czerwony odcień */
-        transition: background-color 0.3s;
-    }
+        /* Main Container */
+        .main-container {
+            display: flex;
+            width: 100%;
+            flex-grow: 1;
+        }
 
-    .stream-sidebar-item:hover {
-        background-color: rgba(255, 0, 0, 0.4); /* Zwiększ kontrast przy najechaniu */
-    }
+        /* Sidebar */
+        .sidebar {
+            width: 250px;
+            background-color: #1e1e1e;
+            padding: 15px;
+            height: 100%;
+            overflow-y: auto;
+            border-right: 2px solid #333;
+            box-sizing: border-box;
+        }
 
-    .stream-avatar {
-        width: 60px;
-        height: 60px;
-        border-radius: 50%;
-        margin-right: 12px;
-        /* Usuń rozmycie */
-    }
+        /* Stream Sidebar Item */
+        .stream-sidebar-item {
+            position: relative;
+            width: 100%;
+            background-color: #2b2b2b;
+            border-radius: 100px;
+            padding: 20px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+        }
+        .stream-sidebar-item:hover {
+            background-color: #444;
+            transform: scale(1.05);
+        }
 
-    .stream-info {
-        display: flex;
-        flex-direction: column;
-    }
+        /* Avatar and Information Styling */
+        .stream-sidebar-item .avatar {
+            position: relative;
+            width: 58px;
+            height: 58px;
+            border-radius: 20px;
+            background: url('image.png'); /* Placeholder for actual avatar */
+            margin-right: 20px;
+        }
+        .stream-sidebar-item .info {
+            color: #fff;
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+        .stream-sidebar-item .info strong {
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 600;
+            font-size: 28px;
+            color: #FFFFFF;
+        }
+        .stream-sidebar-item .info p {
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 600;
+            font-size: 25px;
+            color: #FFFFFF;
+        }
 
-    .nick {
-        font-size: 18px; /* Zwiększ rozmiar czcionki */
-        font-weight: bold;
-        margin-bottom: 4px;
-    }
+        /* Red Dot */
+        .stream-sidebar-item .red-dot {
+            position: absolute;
+            width: 14px;
+            height: 14px;
+            background: #CB203C;
+            border-radius: 50%;
+            top: 15px;
+            right: 15px;
+        }
 
-    .viewers-count {
-        font-size: 14px;
-        color: #ddd;
-    }
+        /* Rectangle Borders and Background Blur */
+        .stream-sidebar-item .rectangle-background {
+            position: absolute;
+            width: 396px;
+            height: 128px;
+            background: rgba(203, 32, 60, 0.08);
+            border: 5px solid #CB203C;
+            filter: blur(12.7px);
+            border-radius: 100px;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            z-index: -1;
+        }
+        .stream-sidebar-item .rectangle-border {
+            position: absolute;
+            width: 396px;
+            height: 131px;
+            border: 5px solid #CB203C;
+            border-radius: 100px;
+            top: -1px;
+            left: -1px;
+            z-index: -2;
+        }
 
-    .viewer-badge {
-        display: inline-block;
-        width: 10px;
-        height: 10px;
-        background-color: red;
-        border-radius: 50%;
-        margin-right: 6px;
-    }
+        /* Main Content Stream Viewer */
+        .main-content {
+            flex-grow: 1;
+            background-color: #1e1e1e;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            box-sizing: border-box;
+            padding: 20px;
+        }
+        #streamViewer {
+            width: 100%;
+            max-width: 1280px;
+            height: 720px;
+            border: none;
+            border-radius: 10px;
+        }
 
-    /* Popraw wygląd iframe */
-    #streamViewer, #chatViewer {
-        width: calc(100% - 320px);
-        height: 100vh;
-        border: none;
-    }
+        /* No Streams Message */
+        #streamList p {
+            font-size: 1.5em;
+            color: #e53e3e;
+            text-align: center;
+        }
     </style>
 </head>
 <body>
-<center>
-<img src="zdjecie.png" width="100px" alt="">
-</center>
-<div class="main-container">
-    <!-- Sidebar for stream list -->
-    <div id="sidebar" class="sidebar"></div>
 
-    <!-- Main content area for stream and chat -->
+<h1>Streamy GTA V</h1>
+
+<div class="main-container">
+    <!-- Sidebar -->
+    <div id="sidebar" class="sidebar">
+        <p style="font-size: 1.3em; color: #f1f1f1;">Wybierz stream</p>
+    </div>
+
+    <!-- Main Content Stream Viewer -->
     <div class="main-content">
         <iframe id="streamViewer" src="" title="Stream" frameborder="0"></iframe>
-        <iframe id="chatViewer" src="" title="Chat" frameborder="0"></iframe>
     </div>
 </div>
 
-<!-- Toggle button for sidebar -->
-<button class="toggle-sidebar" onclick="toggleSidebar()">⬅</button>
-
 <script>
+// Twitch API credentials
 const clientId = 'ffo830okw5x9tcbt51c2wpjhr80jnn';
 const oauthToken = 'sh4ly28ldx12keykw0iedo0y5ellu9';
 const gameId = '32982';
 
-let isLoading = false;
-let hasMoreStreams = true;
-
-function truncateTitle(title) {
-    return title.length > 100 ? title.substring(0, 100) + '...' : title;
-}
-
 async function getStreams(cursor = '') {
-    if (isLoading || !hasMoreStreams) return;
-    isLoading = true;
-
     const url = cursor
         ? `https://api.twitch.tv/helix/streams?game_id=${gameId}&first=100&after=${cursor}&language=pl`
         : `https://api.twitch.tv/helix/streams?game_id=${gameId}&first=100&language=pl`;
 
-    try {
-        const response = await fetch(url, {
-            headers: {
-                'Client-ID': clientId,
-                'Authorization': `Bearer ${oauthToken}`
-            }
-        });
-
-        if (!response.ok) {
-            console.error('API error:', response.status, response.statusText);
-            document.getElementById('sidebar').innerHTML = '<p>Wystąpił błąd podczas pobierania streamów.</p>';
-            return;
+    const response = await fetch(url, {
+        headers: {
+            'Client-ID': clientId,
+            'Authorization': `Bearer ${oauthToken}`
         }
+    });
 
-        const data = await response.json();
+    const data = await response.json();
+    const sidebar = document.getElementById('sidebar');
+    sidebar.innerHTML = ''; // Clear sidebar
 
-        if (data.data && data.data.length > 0) {
-            const filteredStreams = data.data.filter(stream => /infamespl|infames polska|infames pl|infames/.test(stream.title.toLowerCase()));
+    data.data.forEach(stream => {
+        const streamSidebarItem = document.createElement('div');
+        streamSidebarItem.classList.add('stream-sidebar-item');
+        streamSidebarItem.onclick = () => openStream(stream.user_name);
 
-            if (filteredStreams.length === 0) {
-                if (!cursor) {
-                    document.getElementById('sidebar').innerHTML = '<p>Brak streamów spełniających kryteria.</p>';
-                }
-                return;
-            }
+        streamSidebarItem.innerHTML = `
+            <div class="rectangle-background"></div>
+            <div class="rectangle-border"></div>
+            <img class="avatar" src="${stream.thumbnail_url.replace('{width}', '58').replace('{height}', '58')}" alt="${stream.user_name}">
+            <div class="info">
+                <strong>${stream.user_name}</strong>
+                <p>${stream.viewer_count} widzów</p>
+            </div>
+            <div class="red-dot"></div>
+        `;
 
-            const sidebar = document.getElementById('sidebar');
-            filteredStreams.forEach(stream => {
-                const streamSidebarItem = document.createElement('div');
-                streamSidebarItem.className = 'stream-sidebar-item';
-                streamSidebarItem.onclick = () => openStream(stream.user_name);
-
-                const profileImageUrl = stream.thumbnail_url.replace('{width}', '100').replace('{height}', '100');
-                streamSidebarItem.innerHTML = `
-                    <img src="${profileImageUrl}" alt="${stream.user_name}">
-                    <div class="info">
-                        <strong>${stream.user_name}</strong>
-                        <p><span class="viewer-badge"></span>${stream.viewer_count}</p>
-                    </div>
-                `;
-                sidebar.appendChild(streamSidebarItem);
-            });
-
-            // Check if there are more streams
-            hasMoreStreams = !!data.pagination.cursor;
-        } else {
-            hasMoreStreams = false;
-        }
-    } catch (error) {
-        console.error('Błąd podczas pobierania streamów:', error);
-    } finally {
-        isLoading = false;
-    }
+        sidebar.appendChild(streamSidebarItem);
+    });
 }
 
 function openStream(username) {
-    const streamViewer = document.getElementById('streamViewer');
-    const chatViewer = document.getElementById('chatViewer');
-    streamViewer.src = `https://player.twitch.tv/?channel=${username}&parent=example.com`;
-    chatViewer.src = `https://www.twitch.tv/embed/${username}/chat?parent=example.com`;
+    const iframe = document.getElementById('streamViewer');
+    iframe.src = `https://player.twitch.tv/?channel=${username}&parent=sqlnot.github.io&autoplay=true`;
 }
 
-function toggleSidebar() {
-    const sidebar = document.getElementById('sidebar');
-    sidebar.classList.toggle('collapsed');
-    
-    const mainContent = document.querySelector('.main-content');
-    mainContent.style.width = sidebar.classList.contains('collapsed') ? 'calc(100% - 80px)' : 'calc(100% - 200px)';
-}
-
-// Initial call to load streams
-getStreams();
-
+// Load streams on page load
+window.onload = () => getStreams();
 </script>
+
 </body>
 </html>
