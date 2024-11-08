@@ -39,7 +39,7 @@
 
         /* Panel boczny */
         .sidebar {
-            width: 200px;
+            width: 250px;
             background-color: #1e1e1e;
             padding: 10px;
             height: 100%;
@@ -56,55 +56,53 @@
 
         /* Kafelki streamów w panelu bocznym */
         .stream-sidebar-item {
-            background-color: #2b2b2b;
-            border-radius: 8px;
-            padding: 8px;
-            margin-bottom: 10px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            cursor: pointer;
-            transition: background-color 0.3s ease, transform 0.2s ease;
-            width: 100%;
-            box-sizing: border-box;
             position: relative;
+            box-sizing: border-box;
+            width: 396px;
+            height: 128px;
+            background: rgba(203, 32, 60, 0.08);
+            border: 5px solid #CB203C;
+            filter: blur(12.7px);
+            border-radius: 100px;
+            margin-bottom: 10px;
+            padding: 15px;
+            transition: transform 0.3s ease;
+            cursor: pointer;
         }
 
         /* Avatar image style */
         .stream-sidebar-item .avatar {
             position: absolute;
-            top: 20%;
-            left: 10%;
-            width: 50px;
-            height: 50px;
+            width: 58px;
+            height: 58px;
             background: url('image.png') no-repeat center center;
             background-size: cover;
-            border-radius: 50%;
+            border-radius: 20px;
+            top: 15%;
+            left: 15%;
         }
 
         /* Nick (stream title) */
         .stream-sidebar-item .nick {
             position: absolute;
-            top: 10%;
-            left: 30%;
-            width: 60%;
             font-family: 'Montserrat', sans-serif;
             font-weight: 600;
-            font-size: 20px;
+            font-size: 28px;
             color: #fff;
-            line-height: 24px;
+            top: 30%;
+            left: 100px;
+            line-height: 34px;
         }
 
-        /* Red dot indicator with shadow */
+        /* Red dot indicator */
         .stream-sidebar-item .red-dot {
             position: absolute;
             width: 14px;
             height: 14px;
             background: #CB203C;
-            top: 45%;
-            left: 30%;
             border-radius: 50%;
-            box-shadow: 0 0 10px rgba(203, 32, 60, 0.7);
+            top: 45%;
+            left: 100px;
         }
 
         /* Viewer count style */
@@ -112,11 +110,11 @@
             position: absolute;
             font-family: 'Montserrat', sans-serif;
             font-weight: 600;
-            font-size: 18px;
+            font-size: 25px;
             color: #fff;
-            top: 45%;
-            left: 45%;
-            line-height: 22px;
+            top: 50%;
+            left: 120px;
+            line-height: 30px;
         }
 
         /* Kontener dla streamu i czatu */
@@ -125,7 +123,7 @@
             justify-content: center;
             align-items: center;
             gap: 10px;
-            width: calc(100% - 200px);
+            width: calc(100% - 250px);
             margin-left: auto;
             margin-right: auto;
             padding: 20px;
@@ -288,24 +286,21 @@
                 }
 
                 const data = await response.json();
-
                 const sidebar = document.getElementById('sidebar');
 
                 for (const stream of data.data) {
-                    if (stream.title.toLowerCase().includes('infames')) {
-                        const profileImageUrl = await getProfileImageUrl(stream.user_name);
+                    const profileImageUrl = await getProfileImageUrl(stream.user_name);
 
-                        const streamSidebarItem = document.createElement('div');
-                        streamSidebarItem.classList.add('stream-sidebar-item');
-                        streamSidebarItem.innerHTML = `
-                            <div class="avatar" style="background-image: url(${profileImageUrl});"></div>
-                            <div class="nick">${stream.user_name}</div>
-                            <div class="red-dot"></div>
-                            <div class="viewer-count">${stream.viewer_count} widzów</div>
-                        `;
+                    const streamSidebarItem = document.createElement('div');
+                    streamSidebarItem.classList.add('stream-sidebar-item');
+                    streamSidebarItem.innerHTML = `
+                        <div class="avatar" style="background-image: url(${profileImageUrl});"></div>
+                        <div class="nick">${stream.user_name}</div>
+                        <div class="red-dot"></div>
+                        <div class="viewer-count">${stream.viewer_count} widzów</div>
+                    `;
 
-                        sidebar.appendChild(streamSidebarItem);
-                    }
+                    sidebar.appendChild(streamSidebarItem);
                 }
 
                 if (data.pagination && data.pagination.cursor) {
