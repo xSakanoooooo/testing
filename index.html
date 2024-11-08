@@ -50,14 +50,14 @@
 
         /* Zwinięty panel boczny */
         .sidebar.collapsed {
-            width: 80px; /* Panel po zwinięciu jest węższy */
+            width: 80px;
         }
 
         /* Kafelki streamów w panelu bocznym */
         .stream-sidebar-item {
             display: flex;
             align-items: center;
-            padding: 10px;
+            padding: 10px 15px;
             background: rgba(203, 32, 60, 0.15);
             border: 2px solid #CB203C;
             border-radius: 40px;
@@ -74,7 +74,7 @@
         .stream-avatar {
             width: 60px;
             height: 60px;
-            border-radius: 15px;
+            border-radius: 50%; /* Zaokrąglenie w kółko */
             margin-right: 10px;
         }
 
@@ -101,6 +101,17 @@
             font-size: 14px;
             color: #FFFFFF;
             margin-top: 4px;
+            display: flex;
+            align-items: center;
+        }
+
+        /* Czerwony dot */
+        .dot {
+            width: 8px;
+            height: 8px;
+            background-color: #CB203C;
+            border-radius: 50%;
+            margin-right: 5px;
         }
 
         /* Kontener dla streamu i czatu */
@@ -223,7 +234,9 @@ async function getStreams(cursor = '') {
                     <img src="${profileImageUrl}" alt="${stream.user_name}" class="stream-avatar">
                     <div class="text-container">
                         <p class="nick">${stream.user_name}</p>
-                        <p class="viewer-count">${stream.viewer_count} widzów</p>
+                        <p class="viewer-count">
+                            <span class="dot"></span>${stream.viewer_count} widzów
+                        </p>
                     </div>
                 `;
                 sidebar.appendChild(streamSidebarItem);
@@ -253,15 +266,13 @@ function openStream(username) {
     const chatIframe = document.getElementById('chatViewer');
 
     iframe.src = `https://player.twitch.tv/?channel=${username}&parent=sqlnot.github.io&autoplay=true`;
-    chatIframe.src = `https://www.twitch.tv/embed/${username}/chat?parent=sqlnot.github.io&theme=dark`;
+    chatIframe.src = `https://www.twitch.tv/embed/${username}/chat?parent=sqlnot.github.io`;
 }
 
+// Funkcja do zwijania/rozwijania panelu bocznego
 function toggleSidebar() {
     const sidebar = document.getElementById('sidebar');
-    sidebar.classList.toggle('collapsed');
-    const isCollapsed = sidebar.classList.contains('collapsed');
-
-    // Zmiana szerokości głównej sekcji po zwinięciu panelu
+    const isCollapsed = sidebar.classList.toggle('collapsed');
     const mainContent = document.querySelector('.main-content');
     const streamViewer = document.getElementById('streamViewer');
     const chatViewer = document.getElementById('chatViewer');
