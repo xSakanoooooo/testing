@@ -4,12 +4,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="Content-Security-Policy" content="frame-ancestors 'self' https://sqlnot.github.io https://player.twitch.tv;">
-    <title>Streamy GTA V</title>
-    <link href="https://fonts.googleapis.com/css2?family=Josefin+Sans:wght@300&family=Geist&family=Afacad+Flux+Regular&display=swap" rel="stylesheet">
+    <title>Lista streamerów</title>
+    <link rel="shortcut icon" href="logo.png" type="image/x-icon">
     <style>
         /* Globalne style */
         body {
-            font-family: 'Afacad Flux Regular', sans-serif;
+            font-family: 'Arial', sans-serif;
             margin: 0;
             padding: 0;
             background-color: #121212;
@@ -27,7 +27,6 @@
             color: #e53e3e;
             font-weight: bold;
             text-transform: uppercase;
-            text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.6);
         }
 
         /* Kontener z dwiema kolumnami */
@@ -35,85 +34,89 @@
             display: flex;
             width: 100%;
             flex-grow: 1;
+            transition: width 0.3s ease;
         }
 
         /* Panel boczny */
         .sidebar {
-            width: 250px;
+            width: 200px;
             background-color: #1e1e1e;
             padding: 10px;
             height: 100%;
             overflow-y: auto;
             border-right: 2px solid #333;
             box-sizing: border-box;
-            position: relative;
+            transition: width 0.3s ease;
+        }
+
+        /* Zwinięty panel boczny */
+        .sidebar.collapsed {
+            width: 80px;
         }
 
         /* Kafelki streamów w panelu bocznym */
         .stream-sidebar-item {
+            background-color: #2b2b2b;
+            border-radius: 8px;
+            padding: 8px;
+            margin-bottom: 10px;
             display: flex;
             align-items: center;
-            padding: 10px 12px;
-            background: rgba(203, 32, 60, 0.15);
-            border: 2px solid #CB203C;
-            border-radius: 20px;
-            margin-bottom: 15px;
+            justify-content: space-between;
             cursor: pointer;
-            transition: background 0.3s ease, box-shadow 0.3s ease;
-            box-shadow: 0px 0px 10px rgba(203, 32, 60, 0.6);
+            transition: background-color 0.3s ease, transform 0.2s ease;
+            width: 100%;
+            box-sizing: border-box;
+            position: relative;
         }
 
-        .stream-sidebar-item:hover {
-            background: rgba(203, 32, 60, 0.25);
-            box-shadow: 0px 0px 15px rgba(203, 32, 60, 0.9);
+        /* Avatar image style */
+        .stream-sidebar-item .avatar {
+            position: absolute;
+            top: 20%;
+            left: 10%;
+            width: 58px;
+            height: 58px;
+            background: url('image.png') no-repeat center center;
+            background-size: cover;
+            border-radius: 20px;
         }
 
-        /* Czerwony punkt (Red Dot) */
-        .stream-sidebar-item .dot {
-            width: 10px;
-            height: 10px;
-            background-color: red;
-            border-radius: 50%;
-            margin-right: 10px;
-            animation: blink 1s infinite;
-        }
-
-        /* Animacja mrugającego punktu */
-        @keyframes blink {
-            0% {
-                opacity: 1;
-            }
-            50% {
-                opacity: 0;
-            }
-            100% {
-                opacity: 1;
-            }
-        }
-
-        /* Obrazek z podglądem streamu */
-        .stream-avatar {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            margin-right: 12px;
-        }
-
-        /* Nazwa streamu i liczba widzów */
-        .stream-info {
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-        }
-
-        .stream-info strong {
-            font-size: 1.1em;
+        /* Nick (stream title) */
+        .stream-sidebar-item .nick {
+            position: absolute;
+            top: 10%;
+            left: 30%;
+            width: 70%;
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 600;
+            font-size: 28px;
             color: #fff;
+            line-height: 34px;
         }
 
-        .stream-info p {
-            font-size: 0.9em;
-            color: #bbb;
+        /* Red dot indicator */
+        .stream-sidebar-item .red-dot {
+            position: absolute;
+            width: 14px;
+            height: 14px;
+            background: #CB203C;
+            top: 20%;
+            left: 25%;
+            border-radius: 50%;
+        }
+
+        /* Viewer count style */
+        .stream-sidebar-item .viewer-count {
+            position: absolute;
+            width: 445px;
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 600;
+            font-size: 25px;
+            color: #fff;
+            line-height: 30px;
+            top: 50%;
+            left: 30%;
         }
 
         /* Kontener dla streamu i czatu */
@@ -121,16 +124,16 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            gap: 20px;
-            width: calc(100% - 250px);
+            gap: 10px;
+            width: calc(100% - 200px);
             margin-left: auto;
             margin-right: auto;
             padding: 20px;
             box-sizing: border-box;
-            background-color: #1e1e1e;
+            background-image: url(background.png);
+            transition: width 0.3s ease;
         }
 
-        /* Iframe dla streamu */
         #streamViewer {
             width: 78%;
             height: 0;
@@ -138,7 +141,6 @@
             position: relative;
             border: none;
             border-radius: 10px;
-            box-shadow: 0px 0px 15px rgba(203, 32, 60, 0.6);
         }
 
         #streamViewer iframe {
@@ -148,7 +150,6 @@
             border-radius: 10px;
         }
 
-        /* Iframe dla czatu */
         #chatViewer {
             width: 20%;
             height: 0;
@@ -156,7 +157,6 @@
             position: relative;
             border: none;
             border-radius: 10px;
-            box-shadow: 0px 0px 15px rgba(203, 32, 60, 0.6);
         }
 
         #chatViewer iframe {
@@ -166,134 +166,155 @@
             border-radius: 10px;
         }
 
-        /* Komunikaty o braku streamów */
-        #streamList p {
+        /* Przycisk do chowania */
+        .toggle-sidebar {
+            position: absolute;
+            top: 10px;
+            left: 20px;
+            background-color: #1e1e1e;
+            border: none;
+            color: #e5e5e5;
+            padding: 10px;
+            cursor: pointer;
+            border-radius: 5px;
+            transition: padding 0.3s ease, font-size 0.3s ease;
+        }
+
+        .toggle-sidebar:hover {
+            background-color: #444;
+        }
+
+        /* Przycisk w stanie zwiniętym */
+        .sidebar.collapsed + .toggle-sidebar {
+            padding: 15px;
             font-size: 1.5em;
-            color: #e53e3e;
-            text-align: center;
+        }
+
+        /* Zmniejszenie przycisku przy większym panelu */
+        .sidebar:not(.collapsed) + .toggle-sidebar {
+            padding: 10px;
+            font-size: 1.2em;
         }
     </style>
 </head>
 <body>
-<center>
-    <img src="zdjecie.png" width="100px" alt="">
-</center>
-<h1>Streamy INFAMES PL</h1>
-<div class="main-container">
-    <!-- Panel boczny -->
-    <div id="sidebar" class="sidebar">
-        <!-- Lista streamów będzie tutaj dynamicznie dodawana -->
+    <center>
+        <img src="zdjecie.png" width="100px" alt="">
+    </center>
+    <div class="main-container">
+        <!-- Panel boczny -->
+        <div id="sidebar" class="sidebar">
+            <!-- Lista streamów będzie tutaj dynamicznie dodawana -->
+        </div>
+
+        <!-- Kontener na stream i czat -->
+        <div class="main-content">
+            <div id="streamViewer">
+                <iframe src="" title="Stream" frameborder="0"></iframe>
+            </div>
+            <div id="chatViewer">
+                <iframe src="" title="Chat" frameborder="0"></iframe>
+            </div>
+        </div>
     </div>
 
-    <!-- Kontener na stream i czat -->
-    <div class="main-content">
-        <div id="streamViewer">
-            <iframe src="" title="Stream" frameborder="0"></iframe>
-        </div>
-        <div id="chatViewer">
-            <iframe src="" title="Chat" frameborder="0"></iframe>
-        </div>
-    </div>
-</div>
+    <!-- Przycisk do chowania/zamykania panelu bocznego -->
+    <button class="toggle-sidebar" onclick="toggleSidebar()">⬅</button>
 
-<script>
-// Twitch API credentials
-const clientId = 'ffo830okw5x9tcbt51c2wpjhr80jnn';
-const oauthToken = 'sh4ly28ldx12keykw0iedo0y5ellu9';
-const gameId = '32982';
+    <script>
+        // Twitch API credentials
+        const clientId = 'ffo830okw5x9tcbt51c2wpjhr80jnn';
+        const oauthToken = 'sh4ly28ldx12keykw0iedo0y5ellu9';
+        const gameId = '32982';
 
-let isLoading = false;
-let hasMoreStreams = true;
+        let isLoading = false;
+        let hasMoreStreams = true;
 
-function truncateTitle(title) {
-    if (title.length > 100) {
-        return title.substring(0, 100) + '...';
-    }
-    return title;
-}
-
-async function getStreams(cursor = '') {
-    if (isLoading || !hasMoreStreams) return;
-
-    isLoading = true;
-
-    const url = cursor
-        ? `https://api.twitch.tv/helix/streams?game_id=${gameId}&first=100&after=${cursor}&language=pl`
-        : `https://api.twitch.tv/helix/streams?game_id=${gameId}&first=100&language=pl`;
-
-    try {
-        const response = await fetch(url, {
-            headers: {
-                'Client-ID': clientId,
-                'Authorization': `Bearer ${oauthToken}`
+        function truncateTitle(title) {
+            if (title.length > 100) {
+                return title.substring(0, 100) + '...';
             }
-        });
-
-        if (!response.ok) {
-            console.error('Błąd zapytania API:', response.status, response.statusText);
-            document.getElementById('streamList').innerHTML = '<p>Wystąpił błąd podczas pobierania streamów.</p>';
-            return;
+            return title;
         }
 
-        const data = await response.json();
+        async function getStreams(cursor = '') {
+            if (isLoading || !hasMoreStreams) return;
 
-        if (data.data && data.data.length > 0) {
-            const filteredStreams = data.data.filter(stream => {
-                const title = stream.title.toLowerCase();
-                return /infamespl|infames polska|infames pl|infames/.test(title);
-            });
+            isLoading = true;
 
-            if (filteredStreams.length === 0) {
-                if (!cursor) {
-                    document.getElementById('streamList').innerHTML = '<p>Brak streamów spełniających kryteria.</p>';
+            const url = cursor
+                ? `https://api.twitch.tv/helix/streams?game_id=${gameId}&first=100&after=${cursor}&language=pl`
+                : `https://api.twitch.tv/helix/streams?game_id=${gameId}&first=100&language=pl`;
+
+            try {
+                const response = await fetch(url, {
+                    headers: {
+                        'Client-ID': clientId,
+                        'Authorization': `Bearer ${oauthToken}`
+                    }
+                });
+
+                if (!response.ok) {
+                    console.error('Błąd zapytania API:', response.status, response.statusText);
+                    document.getElementById('streamList').innerHTML = '<p>Wystąpił błąd podczas pobierania streamów.</p>';
+                    return;
                 }
-                return;
+
+                const data = await response.json();
+
+                if (data.data && data.data.length > 0) {
+                    const filteredStreams = data.data.filter(stream => {
+                        const title = stream.title.toLowerCase();
+                        return /infamespl|infames polska|infames pl|infames/.test(title);
+                    });
+
+                    if (filteredStreams.length === 0) {
+                        if (!cursor) {
+                            document.getElementById('streamList').innerHTML = '<p>Brak streamów spełniających kryteria.</p>';
+                        }
+                        return;
+                    }
+
+                    const sidebar = document.getElementById('sidebar');
+                    for (const stream of filteredStreams) {
+                        const profileImageUrl = await getProfileImageUrl(stream.user_name);
+                        const streamSidebarItem = document.createElement('div');
+                        streamSidebarItem.className = 'stream-sidebar-item';
+                        streamSidebarItem.onclick = () => openStream(stream.user_name);
+
+                        const viewerBadge = stream.viewer_count > 1000 ? `<span class="viewer-badge"></span>` : '';
+                        const viewerCount = `<span class="viewer-count">${stream.viewer_count}</span>`;
+
+                        streamSidebarItem.innerHTML = `
+                            <div class="avatar" style="background-image: url(${profileImageUrl});"></div>
+                            <div class="nick">${truncateTitle(stream.title)}</div>
+                            <div class="red-dot"></div>
+                            <div class="viewer-count">${stream.viewer_count} widzów</div>
+                        `;
+
+                        sidebar.appendChild(streamSidebarItem);
+                    }
+
+                    if (data.pagination && data.pagination.cursor) {
+                        getStreams(data.pagination.cursor);
+                    } else {
+                        hasMoreStreams = false;
+                    }
+                }
+            } catch (error) {
+                console.error('Błąd zapytania:', error);
+            } finally {
+                isLoading = false;
             }
-
-            const sidebar = document.getElementById('sidebar');
-            filteredStreams.forEach(stream => {
-                const streamSidebarItem = document.createElement('div');
-                streamSidebarItem.className = 'stream-sidebar-item';
-                streamSidebarItem.onclick = () => openStream(stream.user_name);
-
-                const profileImageUrl = stream.thumbnail_url.replace('{width}', '100').replace('{height}', '100');
-                const viewerCount = `<span class="viewer-count">${stream.viewer_count}</span>`;
-
-                streamSidebarItem.innerHTML = `
-                    <div class="dot"></div>
-                    <img class="stream-avatar" src="${profileImageUrl}" alt="${stream.user_name}">
-                    <div class="stream-info">
-                        <strong>${truncateTitle(stream.title)}</strong>
-                        <p>${stream.user_name} - ${viewerCount}</p>
-                    </div>
-                `;
-                sidebar.appendChild(streamSidebarItem);
-            });
-
-            if (data.pagination && data.pagination.cursor) {
-                await getStreams(data.pagination.cursor);
-            } else {
-                hasMoreStreams = false;
-            }
-        } else {
-            hasMoreStreams = false;
         }
-    } catch (error) {
-        console.error('Błąd pobierania danych:', error);
-    } finally {
-        isLoading = false;
-    }
-}
 
-function openStream(streamName) {
-    const streamUrl = `https://www.twitch.tv/${streamName}`;
-    const chatUrl = `https://www.twitch.tv/embed/${streamName}/chat?parent=sqlnot.github.io`;
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            sidebar.classList.toggle('collapsed');
+        }
 
-    document.getElementById('streamViewer').querySelector('iframe').src = streamUrl;
-    document.getElementById('chatViewer').querySelector('iframe').src = chatUrl;
-}
-
-getStreams();
-</script>
+        // Initialize the page with the first batch of streams
+        getStreams();
+    </script>
 </body>
 </html>
