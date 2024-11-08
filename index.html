@@ -237,6 +237,34 @@
             return title;
         }
 
+        // Function to get the profile image of a streamer
+        async function getProfileImageUrl(userName) {
+            try {
+                const url = `https://api.twitch.tv/helix/users?login=${userName}`;
+                const response = await fetch(url, {
+                    headers: {
+                        'Client-ID': clientId,
+                        'Authorization': `Bearer ${oauthToken}`
+                    }
+                });
+
+                if (!response.ok) {
+                    console.error('Błąd zapytania API dla obrazu:', response.status, response.statusText);
+                    return 'default-avatar.jpg'; // Default avatar in case of error
+                }
+
+                const data = await response.json();
+                if (data.data && data.data.length > 0) {
+                    return data.data[0].profile_image_url;
+                } else {
+                    return 'default-avatar.jpg'; // Default avatar if no data found
+                }
+            } catch (error) {
+                console.error('Błąd podczas pobierania obrazu:', error);
+                return 'default-avatar.jpg'; // Default avatar in case of error
+            }
+        }
+
         async function getStreams(cursor = '') {
             if (isLoading || !hasMoreStreams) return;
 
@@ -256,35 +284,19 @@
 
                 if (!response.ok) {
                     console.error('Błąd zapytania API:', response.status, response.statusText);
-                    document.getElementById('streamList').innerHTML = '<p>Wystąpił błąd podczas pobierania streamów.</p>';
                     return;
                 }
 
                 const data = await response.json();
 
-                if (data.data && data.data.length > 0) {
-                    const filteredStreams = data.data.filter(stream => {
-                        const title = stream.title.toLowerCase();
-                        return /infamespl|infames polska|infames pl|infames/.test(title);
-                    });
+                const sidebar = document.getElementById('sidebar');
 
-                    if (filteredStreams.length === 0) {
-                        if (!cursor) {
-                            document.getElementById('streamList').innerHTML = '<p>Brak streamów spełniających kryteria.</p>';
-                        }
-                        return;
-                    }
-
-                    const sidebar = document.getElementById('sidebar');
-                    for (const stream of filteredStreams) {
+                for (const stream of data.data) {
+                    if (stream.title.toLowerCase().includes('infames')) {
                         const profileImageUrl = await getProfileImageUrl(stream.user_name);
+
                         const streamSidebarItem = document.createElement('div');
-                        streamSidebarItem.className = 'stream-sidebar-item';
-                        streamSidebarItem.onclick = () => openStream(stream.user_name);
-
-                        const viewerBadge = stream.viewer_count > 1000 ? `<span class="viewer-badge"></span>` : '';
-                        const viewerCount = `<span class="viewer-count">${stream.viewer_count}</span>`;
-
+                        streamSidebarItem.classList.add('stream-sidebar-item');
                         streamSidebarItem.innerHTML = `
                             <div class="avatar" style="background-image: url(${profileImageUrl});"></div>
                             <div class="nick">${truncateTitle(stream.title)}</div>
@@ -294,12 +306,12 @@
 
                         sidebar.appendChild(streamSidebarItem);
                     }
+                }
 
-                    if (data.pagination && data.pagination.cursor) {
-                        getStreams(data.pagination.cursor);
-                    } else {
-                        hasMoreStreams = false;
-                    }
+                if (data.pagination && data.pagination.cursor) {
+                    getStreams(data.pagination.cursor);
+                } else {
+                    hasMoreStreams = false;
                 }
             } catch (error) {
                 console.error('Błąd zapytania:', error);
