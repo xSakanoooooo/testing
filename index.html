@@ -75,11 +75,11 @@
             position: absolute;
             top: 20%;
             left: 10%;
-            width: 58px;
-            height: 58px;
+            width: 50px;
+            height: 50px;
             background: url('image.png') no-repeat center center;
             background-size: cover;
-            border-radius: 20px;
+            border-radius: 50%;
         }
 
         /* Nick (stream title) */
@@ -87,36 +87,36 @@
             position: absolute;
             top: 10%;
             left: 30%;
-            width: 70%;
+            width: 60%;
             font-family: 'Montserrat', sans-serif;
             font-weight: 600;
-            font-size: 28px;
+            font-size: 20px;
             color: #fff;
-            line-height: 34px;
+            line-height: 24px;
         }
 
-        /* Red dot indicator */
+        /* Red dot indicator with shadow */
         .stream-sidebar-item .red-dot {
             position: absolute;
             width: 14px;
             height: 14px;
             background: #CB203C;
-            top: 20%;
-            left: 25%;
+            top: 45%;
+            left: 30%;
             border-radius: 50%;
+            box-shadow: 0 0 10px rgba(203, 32, 60, 0.7);
         }
 
         /* Viewer count style */
         .stream-sidebar-item .viewer-count {
             position: absolute;
-            width: 445px;
             font-family: 'Montserrat', sans-serif;
             font-weight: 600;
-            font-size: 25px;
+            font-size: 18px;
             color: #fff;
-            line-height: 30px;
-            top: 50%;
-            left: 30%;
+            top: 45%;
+            left: 45%;
+            line-height: 22px;
         }
 
         /* Kontener dla streamu i czatu */
@@ -283,7 +283,7 @@
                 });
 
                 if (!response.ok) {
-                    console.error('Błąd zapytania API:', response.status, response.statusText);
+                    console.error('Błąd zapytania:', response.status, response.statusText);
                     return;
                 }
 
@@ -299,7 +299,7 @@
                         streamSidebarItem.classList.add('stream-sidebar-item');
                         streamSidebarItem.innerHTML = `
                             <div class="avatar" style="background-image: url(${profileImageUrl});"></div>
-                            <div class="nick">${truncateTitle(stream.title)}</div>
+                            <div class="nick">${stream.user_name}</div>
                             <div class="red-dot"></div>
                             <div class="viewer-count">${stream.viewer_count} widzów</div>
                         `;
