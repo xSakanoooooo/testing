@@ -33,7 +33,7 @@
             display: flex;
             width: 100%;
             flex-grow: 1;
-            transition: width 0.3s ease-in-out;
+            transition: width 0.3s ease;
         }
 
         /* Panel boczny */
@@ -45,12 +45,12 @@
             overflow-y: auto;
             border-right: 2px solid #333;
             box-sizing: border-box;
-            transition: width 0.3s ease-in-out;
+            transition: width 0.3s ease;
         }
 
         /* Zwinięty panel boczny */
         .sidebar.collapsed {
-            width: 80px;
+            width: 80px; /* Panel po zwinięciu jest węższy */
         }
 
         /* Kafelki streamów w panelu bocznym */
@@ -68,6 +68,7 @@
             box-sizing: border-box;
         }
 
+        /* Avatar i info o streamie */
         .stream-sidebar-item img {
             width: 40px;
             height: 40px;
@@ -75,6 +76,7 @@
             margin-right: 10px;
         }
 
+        /* Ukrywanie tytułu po zwinięciu panelu bocznego */
         .sidebar.collapsed .stream-sidebar-item .info {
             display: none;
         }
@@ -103,6 +105,7 @@
             margin-top: 5px;
         }
 
+        /* Czerwona lampka obok liczby widzów */
         .viewer-badge {
             width: 8px;
             height: 8px;
@@ -111,6 +114,7 @@
             margin-right: 5px;
         }
 
+        /* Liczba widzów */
         .viewer-count {
             font-size: 0.8em;
             color: #f1f1f1;
@@ -121,31 +125,28 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            gap: 10px;
-            width: calc(100% - 200px);
+            gap: 10px; /* Odstęp między streamem a czatem */
+            width: calc(100% - 200px); /* Pomniejszenie o szerokość sidebar */
             margin-left: auto;
             margin-right: auto;
             padding: 20px;
             box-sizing: border-box;
             background-color: #1e1e1e;
-            transition: width 0.3s ease-in-out;
+            transition: width 0.3s ease; /* Płynna zmiana szerokości */
         }
 
-        /* Ustawienie proporcji 16:9 dla streamu */
+        /* Iframe dla streamu */
         #streamViewer {
             width: 78%;
-            position: relative;
-            padding-bottom: 44.44%; /* Ustawienie proporcji 16:9 (16 / 9 = 1.7777 => 100 / 1.7777 = 56.25%) */
             height: 0;
+            padding-bottom: 44.44%; /* Proporcja 16:9 */
+            position: relative;
             border: none;
             border-radius: 10px;
-            background-color: #000;
         }
 
         #streamViewer iframe {
             position: absolute;
-            top: 0;
-            left: 0;
             width: 100%;
             height: 100%;
             border-radius: 10px;
@@ -154,8 +155,17 @@
         /* Iframe dla czatu */
         #chatViewer {
             width: 20%;
-            height: 730px;
+            height: 0;
+            padding-bottom: 44.44%; /* Proporcja 16:9 */
+            position: relative;
             border: none;
+            border-radius: 10px;
+        }
+
+        #chatViewer iframe {
+            position: absolute;
+            width: 100%;
+            height: 100%;
             border-radius: 10px;
         }
 
@@ -184,11 +194,13 @@
             background-color: #444;
         }
 
+        /* Przycisk w stanie zwiniętym */
         .sidebar.collapsed + .toggle-sidebar {
             padding: 15px;
             font-size: 1.5em;
         }
 
+        /* Zmniejszenie przycisku przy większym panelu */
         .sidebar:not(.collapsed) + .toggle-sidebar {
             padding: 10px;
             font-size: 1.2em;
@@ -197,21 +209,26 @@
 </head>
 <body>
 <center>
-<img src="zdjecie.png" width="100px" alt="">
+    <img src="zdjecie.png" width="100px" alt="">
 </center>
 <div class="main-container">
+    <!-- Panel boczny -->
     <div id="sidebar" class="sidebar">
         <!-- Lista streamów będzie tutaj dynamicznie dodawana -->
     </div>
 
+    <!-- Kontener na stream i czat -->
     <div class="main-content">
         <div id="streamViewer">
             <iframe src="" title="Stream" frameborder="0"></iframe>
         </div>
-        <iframe id="chatViewer" src="" title="Chat" frameborder="0"></iframe>
+        <div id="chatViewer">
+            <iframe src="" title="Chat" frameborder="0"></iframe>
+        </div>
     </div>
 </div>
 
+<!-- Przycisk do chowania/zamykania panelu bocznego -->
 <button class="toggle-sidebar" onclick="toggleSidebar()">⬅</button>
 
 <script>
@@ -256,85 +273,59 @@ async function getStreams(cursor = '') {
         const data = await response.json();
 
         if (data.data && data.data.length > 0) {
-            const filteredStreams = data.data.filter(stream => {
-                const title = stream.title.toLowerCase();
-                return /infamespl|infames polska|infames pl|infames/.test(title);
-            });
-
-            if (filteredStreams.length === 0) {
-                if (!cursor) {
-                    document.getElementById('streamList').innerHTML = '<p>Brak streamów spełniających kryteria.</p>';
+            const streamList = document.getElementById('sidebar');
+            data.data.forEach(stream => {
+                if (stream.title && (stream.title.includes('[INFAMES PL]') || stream.title.includes('INFAMESPL'))) {
+                    const streamItem = document.createElement('div');
+                    streamItem.className = 'stream-sidebar-item';
+                    streamItem.innerHTML = `
+                        <img src="${stream.user_name ? `https://static-cdn.jtvnw.net/jtv_user_pictures/${stream.user_name}-profile_image-70x70.jpg` : ''}" alt="Avatar">
+                        <div class="info">
+                            <strong>${truncateTitle(stream.title)}</strong>
+                            <p><span class="viewer-badge"></span> ${stream.viewer_count} widzów</p>
+                        </div>
+                    `;
+                    streamItem.onclick = () => showStream(stream.user_name, stream.id);
+                    streamList.appendChild(streamItem);
                 }
-                return;
-            }
-
-            const sidebar = document.getElementById('sidebar');
-            filteredStreams.forEach(stream => {
-                const streamSidebarItem = document.createElement('div');
-                streamSidebarItem.className = 'stream-sidebar-item';
-                streamSidebarItem.onclick = () => openStream(stream.user_name);
-
-                const profileImageUrl = stream.thumbnail_url.replace('{width}', '100').replace('{height}', '100');
-                streamSidebarItem.innerHTML = ` 
-                    <img src="${profileImageUrl}" alt="${stream.user_name}">
-                    <div class="info">
-                        <strong>${stream.user_name}</strong>
-                        <p><span class="viewer-badge"></span>${stream.viewer_count} widzów</p>
-                    </div>
-                `;
-                sidebar.appendChild(streamSidebarItem);
             });
 
-            if (data.pagination && data.pagination.cursor) {
-                getStreams(data.pagination.cursor);
-            } else {
-                hasMoreStreams = false;
-            }
+            hasMoreStreams = !!data.pagination.cursor;
         } else {
-            if (!cursor) {
-                document.getElementById('streamList').innerHTML = '<p>Brak streamów w tej chwili.</p>';
-            }
+            document.getElementById('streamList').innerHTML = '<p>Brak streamów z tym tagiem.</p>';
         }
     } catch (error) {
-        console.error('Wystąpił błąd:', error);
+        console.error('Błąd podczas ładowania streamów:', error);
         document.getElementById('streamList').innerHTML = '<p>Wystąpił błąd podczas pobierania streamów.</p>';
     } finally {
         isLoading = false;
     }
 }
 
-function openStream(username) {
-    const iframe = document.querySelector('#streamViewer iframe');
-    const chatIframe = document.getElementById('chatViewer');
+function showStream(userName, streamId) {
+    const streamUrl = `https://player.twitch.tv/?channel=${userName}&parent=sqlnot.github.io`;
+    const chatUrl = `https://www.twitch.tv/embed/${userName}/chat?parent=sqlnot.github.io`;
 
-    iframe.src = `https://player.twitch.tv/?channel=${username}&parent=sqlnot.github.io&autoplay=true`;
-    chatIframe.src = `https://www.twitch.tv/embed/${username}/chat?parent=sqlnot.github.io&theme=dark`;
+    const streamViewer = document.getElementById('streamViewer').querySelector('iframe');
+    const chatViewer = document.getElementById('chatViewer').querySelector('iframe');
+
+    streamViewer.src = streamUrl;
+    chatViewer.src = chatUrl;
 }
 
+// Toggle panel boczny
 function toggleSidebar() {
     const sidebar = document.getElementById('sidebar');
-    const button = document.querySelector('.toggle-sidebar');
     sidebar.classList.toggle('collapsed');
-    const isCollapsed = sidebar.classList.contains('collapsed');
-
-    const mainContent = document.querySelector('.main-content');
-    const streamViewer = document.getElementById('streamViewer');
-    const chatViewer = document.getElementById('chatViewer');
-
-    if (isCollapsed) {
-        mainContent.style.width = 'calc(100% - 80px)';
-        streamViewer.style.width = '85%';
-        chatViewer.style.width = '15%';
-        button.textContent = '➡';
-    } else {
-        mainContent.style.width = 'calc(100% - 200px)';
-        streamViewer.style.width = '78%';
-        chatViewer.style.width = '20%';
-        button.textContent = '⬅';
-    }
+    // Aktualizacja przycisku
+    const toggleButton = document.querySelector('.toggle-sidebar');
+    toggleButton.innerHTML = sidebar.classList.contains('collapsed') ? '➡' : '⬅';
 }
 
-getStreams();
+// Ładuj streamy po załadowaniu strony
+window.onload = function () {
+    getStreams();
+};
 </script>
 </body>
 </html>
