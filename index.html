@@ -7,125 +7,77 @@
     <title>Infames Polska LIVE</title>
     <link rel="shortcut icon" href="logo.png" type="image/x-icon">
     <style>
+           <style>
         body {
-            font-family: 'Arial', sans-serif;
-            margin: 0;
-            padding: 0;
+            font-family: 'Montserrat', sans-serif;
             background-color: #121212;
             color: #e5e5e5;
+            margin: 0;
+            padding: 0;
             display: flex;
+            justify-content: center;
+            align-items: center;
             height: 100vh;
             flex-direction: column;
         }
 
-        h1 {
-            text-align: center;
-            margin: 20px 0;
-            font-size: 2.5em;
-            color: #e53e3e;
-            font-weight: bold;
-            text-transform: uppercase;
-        }
-
-        .main-container {
-            display: flex;
-            width: 100%;
-            flex-grow: 1;
-            transition: width 0.3s ease;
-        }
-
-        .sidebar {
+        .stream-sidebar {
             width: 250px;
-            background-color: #1e1e1e;
-            padding: 10px;
-            height: 100%;
-            overflow-y: auto;
-            border-right: 2px solid #333;
-            box-sizing: border-box;
-            transition: width 0.3s ease;
-            background-image: url(pasek2.png);
-            background-size: cover;
-            background-position: center;
-        }
-
-        .sidebar.collapsed {
-            width: 80px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
         }
 
         .stream-sidebar-item {
-            background-color: #2b2b2b;
-            border-radius: 8px;
-            padding: 8px;
-            margin-bottom: 10px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            cursor: pointer;
-            transition: background-color 0.3s ease, transform 0.2s ease;
-            width: 100%;
+            position: relative;
             box-sizing: border-box;
-        }
-
-        .stream-sidebar-item img {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            margin-right: 10px;
-        }
-
-        .sidebar.collapsed .stream-sidebar-item .info {
-            display: none;
-        }
-
-        .stream-sidebar-item .info {
-            color: #fff;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            flex-grow: 1;
-            text-align: center;
-        }
-
-        .stream-sidebar-item .info strong {
-            font-size: 0.9em;
-            color: #f1f1f1;
-        }
-
-        .stream-sidebar-item .info p {
-            font-size: 0.8em;
-            color: #bbb;
+            width: 100%;
+            height: 80px;
+            background: rgba(203, 32, 60, 0.08);
+            border: 5px solid #CB203C;
+            border-radius: 100px;
+            margin-bottom: 10px;
+            padding: 10px;
             display: flex;
             align-items: center;
-            justify-content: center;
-            margin: 0;
-            margin-top: 5px;
+            cursor: pointer;
         }
 
-        .viewer-badge {
-            width: 8px;
-            height: 8px;
+        .avatar {
+            width: 58px;
+            height: 58px;
+            background: url('image.png') no-repeat center center;
+            background-size: cover;
             border-radius: 50%;
-            background-color: red;
-            margin-right: 5px;
+            margin-right: 15px;
+        }
+
+        .nick {
+            font-weight: 500;
+            font-size: 18px;
+            color: #fff;
+            line-height: 22px;
+        }
+
+        .red-dot {
+            width: 10px;
+            height: 10px;
+            background: #CB203C;
+            border-radius: 50%;
+            margin-left: 5px;
         }
 
         .viewer-count {
-            font-size: 0.8em;
-            color: #f1f1f1;
+            font-weight: 600;
+            font-size: 14px;
+            color: #fff;
+            margin-left: 5px;
         }
 
-        .main-content {
+        .viewer-info {
             display: flex;
-            justify-content: center;
             align-items: center;
-            gap: 10px;
-            width: calc(100% - 250px);
-            padding: 20px;
-            box-sizing: border-box;
-            background-image: url(background.png);
-            background-size: cover;
-            background-position: center;
-            transition: width 0.3s ease;
+            margin-top: 5px;
         }
     </style>
 </head>
