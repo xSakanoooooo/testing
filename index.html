@@ -46,78 +46,54 @@
             border-right: 2px solid #333;
             box-sizing: border-box;
             transition: width 0.3s ease;
+            position: relative;
         }
 
         /* Zwinięty panel boczny */
         .sidebar.collapsed {
-            width: 80px; /* Panel po zwinięciu jest węższy */
+            width: 80px;
         }
 
         /* Kafelki streamów w panelu bocznym */
         .stream-sidebar-item {
-            background-color: #2b2b2b;
-            border-radius: 8px;
-            padding: 8px;
-            margin-bottom: 10px;
             display: flex;
             align-items: center;
-            justify-content: space-between;
+            padding: 8px 10px;
+            background: rgba(203, 32, 60, 0.15);
+            border: 2px solid #CB203C;
+            border-radius: 20px;
+            margin-bottom: 10px;
             cursor: pointer;
-            transition: background-color 0.3s ease, transform 0.2s ease;
-            width: 100%;
-            box-sizing: border-box;
+            transition: background 0.3s ease;
         }
 
-        /* Avatar i info o streamie */
-        .stream-sidebar-item img {
+        .stream-sidebar-item:hover {
+            background: rgba(203, 32, 60, 0.25);
+        }
+
+        /* Obrazek z podglądem streamu */
+        .stream-avatar {
             width: 40px;
             height: 40px;
             border-radius: 50%;
             margin-right: 10px;
         }
 
-        /* Ukrywanie tytułu po zwinięciu panelu bocznego */
-        .sidebar.collapsed .stream-sidebar-item .info {
-            display: none;
-        }
-
-        .stream-sidebar-item .info {
-            color: #fff;
+        /* Nazwa streamu i liczba widzów */
+        .stream-info {
             display: flex;
             flex-direction: column;
             justify-content: center;
-            flex-grow: 1;
-            text-align: center;
         }
 
-        .stream-sidebar-item .info strong {
-            font-size: 0.9em;
-            color: #f1f1f1;
+        .stream-info strong {
+            font-size: 1em;
+            color: #fff;
         }
 
-        .stream-sidebar-item .info p {
-            font-size: 0.8em;
+        .stream-info p {
+            font-size: 0.85em;
             color: #bbb;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin: 0;
-            margin-top: 5px;
-        }
-
-        /* Czerwona lampka obok liczby widzów */
-        .viewer-badge {
-            width: 8px;
-            height: 8px;
-            border-radius: 50%;
-            background-color: red;
-            margin-right: 5px;
-        }
-
-        /* Liczba widzów */
-        .viewer-count {
-            font-size: 0.8em;
-            color: #f1f1f1;
         }
 
         /* Kontener dla streamu i czatu */
@@ -125,21 +101,21 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            gap: 10px; /* Odstęp między streamem a czatem */
-            width: calc(100% - 200px); /* Pomniejszenie o szerokość sidebar */
+            gap: 10px;
+            width: calc(100% - 200px);
             margin-left: auto;
             margin-right: auto;
             padding: 20px;
             box-sizing: border-box;
             background-color: #1e1e1e;
-            transition: width 0.3s ease; /* Płynna zmiana szerokości */
+            transition: width 0.3s ease;
         }
 
         /* Iframe dla streamu */
         #streamViewer {
             width: 78%;
             height: 0;
-            padding-bottom: 44.44%; /* Proporcja 16:9 */
+            padding-bottom: 44.44%;
             position: relative;
             border: none;
             border-radius: 10px;
@@ -156,7 +132,7 @@
         #chatViewer {
             width: 20%;
             height: 0;
-            padding-bottom: 44.44%; /* Proporcja 16:9 */
+            padding-bottom: 44.44%;
             position: relative;
             border: none;
             border-radius: 10px;
@@ -273,59 +249,71 @@ async function getStreams(cursor = '') {
         const data = await response.json();
 
         if (data.data && data.data.length > 0) {
-            const streamList = document.getElementById('sidebar');
-            data.data.forEach(stream => {
-                if (stream.title && (stream.title.includes('[INFAMES PL]') || stream.title.includes('INFAMESPL'))) {
-                    const streamItem = document.createElement('div');
-                    streamItem.className = 'stream-sidebar-item';
-                    streamItem.innerHTML = `
-                        <img src="${stream.user_name ? `https://static-cdn.jtvnw.net/jtv_user_pictures/${stream.user_name}-profile_image-70x70.jpg` : ''}" alt="Avatar">
-                        <div class="info">
-                            <strong>${truncateTitle(stream.title)}</strong>
-                            <p><span class="viewer-badge"></span> ${stream.viewer_count} widzów</p>
-                        </div>
-                    `;
-                    streamItem.onclick = () => showStream(stream.user_name, stream.id);
-                    streamList.appendChild(streamItem);
-                }
+            const filteredStreams = data.data.filter(stream => {
+                const title = stream.title.toLowerCase();
+                return /infamespl|infames polska|infames pl|infames/.test(title);
             });
 
-            hasMoreStreams = !!data.pagination.cursor;
-        } else {
-            document.getElementById('streamList').innerHTML = '<p>Brak streamów z tym tagiem.</p>';
+            if (filteredStreams.length === 0) {
+                if (!cursor) {
+                    document.getElementById('streamList').innerHTML = '<p>Brak streamów spełniających kryteria.</p>';
+                }
+                return;
+            }
+
+            const sidebar = document.getElementById('sidebar');
+            filteredStreams.forEach(stream => {
+                const streamSidebarItem = document.createElement('div');
+                streamSidebarItem.className = 'stream-sidebar-item';
+                streamSidebarItem.onclick = () => openStream(stream.user_name);
+
+                const profileImageUrl = stream.thumbnail_url.replace('{width}', '100').replace('{height}', '100');
+                const viewerBadge = stream.viewer_count > 1000 ? `<span class="viewer-badge"></span>` : '';
+                const viewerCount = `<span class="viewer-count">${stream.viewer_count}</span>`;
+
+                streamSidebarItem.innerHTML = `
+                    <img src="${profileImageUrl}" alt="${stream.user_name}" class="stream-avatar">
+                    <div class="stream-info">
+                        <strong>${stream.user_name}</strong>
+                        <p><span class="viewer-badge"></span>${stream.viewer_count} widzów</p>
+                    </div>
+                `;
+                sidebar.appendChild(streamSidebarItem);
+            });
+
+            if (data.pagination && data.pagination.cursor) {
+                getStreams(data.pagination.cursor);
+            } else {
+                hasMoreStreams = false;
+            }
         }
     } catch (error) {
-        console.error('Błąd podczas ładowania streamów:', error);
-        document.getElementById('streamList').innerHTML = '<p>Wystąpił błąd podczas pobierania streamów.</p>';
+        console.error('Błąd pobierania danych:', error);
     } finally {
         isLoading = false;
     }
 }
 
-function showStream(userName, streamId) {
-    const streamUrl = `https://player.twitch.tv/?channel=${userName}&parent=sqlnot.github.io`;
-    const chatUrl = `https://www.twitch.tv/embed/${userName}/chat?parent=sqlnot.github.io`;
+function openStream(streamName) {
+    const streamUrl = `https://www.twitch.tv/${streamName}`;
+    const chatUrl = `https://www.twitch.tv/embed/${streamName}/chat?parent=sqlnot.github.io`;
 
-    const streamViewer = document.getElementById('streamViewer').querySelector('iframe');
-    const chatViewer = document.getElementById('chatViewer').querySelector('iframe');
-
-    streamViewer.src = streamUrl;
-    chatViewer.src = chatUrl;
+    document.getElementById('streamViewer').querySelector('iframe').src = streamUrl;
+    document.getElementById('chatViewer').querySelector('iframe').src = chatUrl;
 }
 
-// Toggle panel boczny
 function toggleSidebar() {
     const sidebar = document.getElementById('sidebar');
-    sidebar.classList.toggle('collapsed');
-    // Aktualizacja przycisku
     const toggleButton = document.querySelector('.toggle-sidebar');
-    toggleButton.innerHTML = sidebar.classList.contains('collapsed') ? '➡' : '⬅';
+    sidebar.classList.toggle('collapsed');
+    if (sidebar.classList.contains('collapsed')) {
+        toggleButton.innerText = '➡';
+    } else {
+        toggleButton.innerText = '⬅';
+    }
 }
 
-// Ładuj streamy po załadowaniu strony
-window.onload = function () {
-    getStreams();
-};
+getStreams();
 </script>
 </body>
 </html>
