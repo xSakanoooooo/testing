@@ -5,10 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="Content-Security-Policy" content="frame-ancestors 'self' https://sqlnot.github.io https://player.twitch.tv;">
     <title>Streamy GTA V</title>
+    <link href="https://fonts.googleapis.com/css2?family=Josefin+Sans:wght@300&family=Geist&family=Afacad+Flux+Regular&display=swap" rel="stylesheet">
     <style>
         /* Globalne style */
         body {
-            font-family: 'Arial', sans-serif;
+            font-family: 'Afacad Flux Regular', sans-serif;
             margin: 0;
             padding: 0;
             background-color: #121212;
@@ -26,6 +27,7 @@
             color: #e53e3e;
             font-weight: bold;
             text-transform: uppercase;
+            text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.6);
         }
 
         /* Kontener z dwiema kolumnami */
@@ -33,42 +35,60 @@
             display: flex;
             width: 100%;
             flex-grow: 1;
-            transition: width 0.3s ease;
         }
 
         /* Panel boczny */
         .sidebar {
-            width: 200px;
+            width: 250px;
             background-color: #1e1e1e;
             padding: 10px;
             height: 100%;
             overflow-y: auto;
             border-right: 2px solid #333;
             box-sizing: border-box;
-            transition: width 0.3s ease;
             position: relative;
-        }
-
-        /* Zwinięty panel boczny */
-        .sidebar.collapsed {
-            width: 80px;
         }
 
         /* Kafelki streamów w panelu bocznym */
         .stream-sidebar-item {
             display: flex;
             align-items: center;
-            padding: 8px 10px;
+            padding: 10px 12px;
             background: rgba(203, 32, 60, 0.15);
             border: 2px solid #CB203C;
             border-radius: 20px;
-            margin-bottom: 10px;
+            margin-bottom: 15px;
             cursor: pointer;
-            transition: background 0.3s ease;
+            transition: background 0.3s ease, box-shadow 0.3s ease;
+            box-shadow: 0px 0px 10px rgba(203, 32, 60, 0.6);
         }
 
         .stream-sidebar-item:hover {
             background: rgba(203, 32, 60, 0.25);
+            box-shadow: 0px 0px 15px rgba(203, 32, 60, 0.9);
+        }
+
+        /* Czerwony punkt (Red Dot) */
+        .stream-sidebar-item .dot {
+            width: 10px;
+            height: 10px;
+            background-color: red;
+            border-radius: 50%;
+            margin-right: 10px;
+            animation: blink 1s infinite;
+        }
+
+        /* Animacja mrugającego punktu */
+        @keyframes blink {
+            0% {
+                opacity: 1;
+            }
+            50% {
+                opacity: 0;
+            }
+            100% {
+                opacity: 1;
+            }
         }
 
         /* Obrazek z podglądem streamu */
@@ -76,7 +96,7 @@
             width: 40px;
             height: 40px;
             border-radius: 50%;
-            margin-right: 10px;
+            margin-right: 12px;
         }
 
         /* Nazwa streamu i liczba widzów */
@@ -87,12 +107,12 @@
         }
 
         .stream-info strong {
-            font-size: 1em;
+            font-size: 1.1em;
             color: #fff;
         }
 
         .stream-info p {
-            font-size: 0.85em;
+            font-size: 0.9em;
             color: #bbb;
         }
 
@@ -101,14 +121,13 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            gap: 10px;
-            width: calc(100% - 200px);
+            gap: 20px;
+            width: calc(100% - 250px);
             margin-left: auto;
             margin-right: auto;
             padding: 20px;
             box-sizing: border-box;
             background-color: #1e1e1e;
-            transition: width 0.3s ease;
         }
 
         /* Iframe dla streamu */
@@ -119,6 +138,7 @@
             position: relative;
             border: none;
             border-radius: 10px;
+            box-shadow: 0px 0px 15px rgba(203, 32, 60, 0.6);
         }
 
         #streamViewer iframe {
@@ -136,6 +156,7 @@
             position: relative;
             border: none;
             border-radius: 10px;
+            box-shadow: 0px 0px 15px rgba(203, 32, 60, 0.6);
         }
 
         #chatViewer iframe {
@@ -151,42 +172,13 @@
             color: #e53e3e;
             text-align: center;
         }
-
-        /* Przycisk do chowania */
-        .toggle-sidebar {
-            position: absolute;
-            top: 20px;
-            left: 20px;
-            background-color: #1e1e1e;
-            border: none;
-            color: #e5e5e5;
-            padding: 10px;
-            cursor: pointer;
-            border-radius: 5px;
-            transition: padding 0.3s ease, font-size 0.3s ease;
-        }
-
-        .toggle-sidebar:hover {
-            background-color: #444;
-        }
-
-        /* Przycisk w stanie zwiniętym */
-        .sidebar.collapsed + .toggle-sidebar {
-            padding: 15px;
-            font-size: 1.5em;
-        }
-
-        /* Zmniejszenie przycisku przy większym panelu */
-        .sidebar:not(.collapsed) + .toggle-sidebar {
-            padding: 10px;
-            font-size: 1.2em;
-        }
     </style>
 </head>
 <body>
 <center>
     <img src="zdjecie.png" width="100px" alt="">
 </center>
+<h1>Streamy INFAMES PL</h1>
 <div class="main-container">
     <!-- Panel boczny -->
     <div id="sidebar" class="sidebar">
@@ -203,9 +195,6 @@
         </div>
     </div>
 </div>
-
-<!-- Przycisk do chowania/zamykania panelu bocznego -->
-<button class="toggle-sidebar" onclick="toggleSidebar()">⬅</button>
 
 <script>
 // Twitch API credentials
@@ -268,24 +257,26 @@ async function getStreams(cursor = '') {
                 streamSidebarItem.onclick = () => openStream(stream.user_name);
 
                 const profileImageUrl = stream.thumbnail_url.replace('{width}', '100').replace('{height}', '100');
-                const viewerBadge = stream.viewer_count > 1000 ? `<span class="viewer-badge"></span>` : '';
                 const viewerCount = `<span class="viewer-count">${stream.viewer_count}</span>`;
 
                 streamSidebarItem.innerHTML = `
-                    <img src="${profileImageUrl}" alt="${stream.user_name}" class="stream-avatar">
+                    <div class="dot"></div>
+                    <img class="stream-avatar" src="${profileImageUrl}" alt="${stream.user_name}">
                     <div class="stream-info">
-                        <strong>${stream.user_name}</strong>
-                        <p><span class="viewer-badge"></span>${stream.viewer_count} widzów</p>
+                        <strong>${truncateTitle(stream.title)}</strong>
+                        <p>${stream.user_name} - ${viewerCount}</p>
                     </div>
                 `;
                 sidebar.appendChild(streamSidebarItem);
             });
 
             if (data.pagination && data.pagination.cursor) {
-                getStreams(data.pagination.cursor);
+                await getStreams(data.pagination.cursor);
             } else {
                 hasMoreStreams = false;
             }
+        } else {
+            hasMoreStreams = false;
         }
     } catch (error) {
         console.error('Błąd pobierania danych:', error);
@@ -300,17 +291,6 @@ function openStream(streamName) {
 
     document.getElementById('streamViewer').querySelector('iframe').src = streamUrl;
     document.getElementById('chatViewer').querySelector('iframe').src = chatUrl;
-}
-
-function toggleSidebar() {
-    const sidebar = document.getElementById('sidebar');
-    const toggleButton = document.querySelector('.toggle-sidebar');
-    sidebar.classList.toggle('collapsed');
-    if (sidebar.classList.contains('collapsed')) {
-        toggleButton.innerText = '➡';
-    } else {
-        toggleButton.innerText = '⬅';
-    }
 }
 
 getStreams();
