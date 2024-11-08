@@ -54,72 +54,72 @@
             width: 80px;
         }
 
-        /* Kafelki streamów w panelu bocznym */
-        .stream-sidebar-item {
-            position: relative;
-            box-sizing: border-box;
-            width: 100%;
-            height: 80px;
-            background: rgba(203, 32, 60, 0.08);
-            border: 5px solid #CB203C;
-            border-radius: 100px;
-            margin-bottom: 10px;
-            padding: 10px;
-            transition: transform 0.3s ease;
-            cursor: pointer;
-        }
+       /* Kafelki streamów w panelu bocznym */
+.stream-sidebar-item {
+    position: relative;
+    box-sizing: border-box;
+    width: 100%;
+    height: 80px;
+    background: rgba(203, 32, 60, 0.08);
+    border: 5px solid #CB203C;
+    border-radius: 100px;
+    margin-bottom: 10px;
+    padding: 10px;
+    transition: transform 0.3s ease;
+    cursor: pointer;
+}
 
-        /* Avatar image style - okrągły avatar */
-        .stream-sidebar-item .avatar {
-            position: absolute;
-            width: 58px;
-            height: 58px;
-            background: url('image.png') no-repeat center center;
-            background-size: cover;
-            border-radius: 50%; /* Określenie okrągłego avatara */
-            top: 10px;
-            left: 10px;
-        }
+/* Avatar image style - okrągły avatar */
+.stream-sidebar-item .avatar {
+    position: absolute;
+    width: 58px;
+    height: 58px;
+    background: url('image.png') no-repeat center center;
+    background-size: cover;
+    border-radius: 50%; /* Określenie okrągłego avatara */
+    top: 10px;
+    left: 10px;
+}
 
-        /* Nick (stream title) */
-        .stream-sidebar-item .nick {
-            position: absolute;
-            font-family: 'Montserrat', sans-serif;
-            font-weight: 500; /* Zmniejszone */
-            font-size: 18px; /* Zmniejszone */
-            color: #fff;
-            top: 20px;
-            left: 80px;
-            line-height: 22px; /* Zmniejszone */
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
+/* Nick (stream title) */
+.stream-sidebar-item .nick {
+    position: absolute;
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 500; /* Zmniejszone */
+    font-size: 18px; /* Zmniejszone */
+    color: #fff;
+    top: 20px;
+    left: 80px;
+    line-height: 22px; /* Zmniejszone */
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
 
-        /* Red dot indicator (przeniesiono na lewo obok widzów) */
-        .stream-sidebar-item .red-dot {
-            position: absolute;
-            width: 10px; /* Zmniejszenie kropki */
-            height: 10px; /* Zmniejszenie kropki */
-            background: #CB203C;
-            border-radius: 50%;
-            top: 50%;
-            left: 70px; /* Ustawienie na lewo od liczby widzów */
-            transform: translateY(-50%);
-        }
+/* Red dot indicator (przeniesiono pod nick) */
+.stream-sidebar-item .red-dot {
+    position: absolute;
+    width: 10px; /* Zmniejszenie kropki */
+    height: 10px; /* Zmniejszenie kropki */
+    background: #CB203C;
+    border-radius: 50%;
+    top: 50%; /* Przenosimy kropkę na dół pod nick */
+    left: 80px;
+    transform: translateY(10px); /* Przesunięcie w dół */
+}
 
-        /* Viewer count style (zmniejszone) */
-        .stream-sidebar-item .viewer-count {
-            position: absolute;
-            font-family: 'Montserrat', sans-serif;
-            font-weight: 600;
-            font-size: 14px; /* Zmniejszone */
-            color: #fff;
-            top: 50%;
-            left: 85px;
-            line-height: 18px; /* Zmniejszone */
-            transform: translateY(-50%);
-        }
+/* Viewer count style (zmniejszone) */
+.stream-sidebar-item .viewer-count {
+    position: absolute;
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 600;
+    font-size: 14px; /* Zmniejszone */
+    color: #fff;
+    top: 50%;
+    left: 95px;
+    line-height: 18px; /* Zmniejszone */
+    transform: translateY(10px); /* Przesunięcie w dół */
+}
 
         /* Kontener dla streamu i czatu */
         .main-content {
