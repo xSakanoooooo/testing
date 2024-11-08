@@ -69,14 +69,14 @@
             cursor: pointer;
         }
 
-        /* Avatar image style */
+        /* Avatar image style - okrągły avatar */
         .stream-sidebar-item .avatar {
             position: absolute;
             width: 58px;
             height: 58px;
             background: url('image.png') no-repeat center center;
             background-size: cover;
-            border-radius: 20px;
+            border-radius: 50%; /* Określenie okrągłego avatara */
             top: 10px;
             left: 10px;
         }
@@ -85,12 +85,12 @@
         .stream-sidebar-item .nick {
             position: absolute;
             font-family: 'Montserrat', sans-serif;
-            font-weight: 600;
-            font-size: 20px;
+            font-weight: 500; /* Zmniejszone */
+            font-size: 18px; /* Zmniejszone */
             color: #fff;
             top: 20px;
             left: 80px;
-            line-height: 24px;
+            line-height: 22px; /* Zmniejszone */
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
@@ -112,11 +112,11 @@
             position: absolute;
             font-family: 'Montserrat', sans-serif;
             font-weight: 600;
-            font-size: 18px;
+            font-size: 16px; /* Zmniejszone */
             color: #fff;
-            top: 50%;
+            top: 55%;
             left: 100px;
-            line-height: 22px;
+            line-height: 20px; /* Zmniejszone */
         }
 
         /* Kontener dla streamu i czatu */
@@ -225,7 +225,7 @@
         // Twitch API credentials
         const clientId = 'ffo830okw5x9tcbt51c2wpjhr80jnn';
         const oauthToken = 'sh4ly28ldx12keykw0iedo0y5ellu9';
-        const gameId = '32982';
+        const gameId = '32982'; // ID gry Infames
 
         let isLoading = false;
         let hasMoreStreams = true;
@@ -271,8 +271,8 @@
             isLoading = true;
 
             const url = cursor
-                ? `https://api.twitch.tv/helix/streams?game_id=${gameId}&first=100&after=${cursor}&language=pl`
-                : `https://api.twitch.tv/helix/streams?game_id=${gameId}&first=100&language=pl`;
+                ? `https://api.twitch.tv/helix/streams?game_id=${gameId}&first=10&after=${cursor}`
+                : `https://api.twitch.tv/helix/streams?game_id=${gameId}&first=10`;
 
             try {
                 const response = await fetch(url, {
@@ -297,7 +297,7 @@
                     streamSidebarItem.classList.add('stream-sidebar-item');
                     streamSidebarItem.innerHTML = `
                         <div class="avatar" style="background-image: url(${profileImageUrl});"></div>
-                        <div class="nick">${stream.user_name}</div>
+                        <div class="nick">${truncateTitle(stream.user_name)}</div>
                         <div class="red-dot"></div>
                         <div class="viewer-count">${stream.viewer_count} widzów</div>
                     `;
