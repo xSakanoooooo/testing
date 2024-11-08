@@ -65,58 +65,98 @@
             transition: background-color 0.3s ease, transform 0.2s ease;
             width: 100%;
             box-sizing: border-box;
+            position: relative;
         }
 
         /* Avatar i info o streamie */
         .stream-sidebar-item img {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            margin-right: 10px;
+            width: 45px;
+            height: 46px;
+            border-radius: 20px;
+            position: relative;
+            z-index: 1;
         }
 
-        /* Ukrywanie tytułu po zwinięciu panelu bocznego */
-        .sidebar.collapsed .stream-sidebar-item .info {
-            display: none;
-        }
-
-        .stream-sidebar-item .info {
-            color: #fff;
+        /* Tytuł i informacje o liczbie widzów */
+        .info {
             display: flex;
             flex-direction: column;
-            justify-content: center;
+            margin-left: 10px;
             flex-grow: 1;
-            text-align: center;
+            text-align: left;
         }
 
-        .stream-sidebar-item .info strong {
+        .info strong {
             font-size: 0.9em;
             color: #f1f1f1;
         }
 
-        .stream-sidebar-item .info p {
+        .info p {
             font-size: 0.8em;
             color: #bbb;
             display: flex;
             align-items: center;
-            justify-content: center;
             margin: 0;
             margin-top: 5px;
         }
 
         /* Czerwona lampka obok liczby widzów */
         .viewer-badge {
-            width: 8px;
-            height: 8px;
+            width: 14px;
+            height: 14px;
             border-radius: 50%;
-            background-color: red;
+            background-color: #CB203C;
             margin-right: 5px;
+            position: relative;
+            z-index: 2;
         }
 
         /* Liczba widzów */
         .viewer-count {
             font-size: 0.8em;
             color: #f1f1f1;
+        }
+
+        /* Efekt czerwonego tła za awatarem */
+        .avatar-background {
+            position: absolute;
+            left: 25%;
+            right: 25%;
+            top: 29.17%;
+            bottom: 29.17%;
+            width: 58px;
+            height: 58px;
+            background-color: rgba(203, 32, 60, 0.08);
+            border: 5px solid #CB203C;
+            filter: blur(12.7px);
+            border-radius: 100px;
+            z-index: 0;
+        }
+
+        /* Nick */
+        .nick {
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 600;
+            font-size: 28px;
+            line-height: 34px;
+            color: #FFFFFF;
+            position: absolute;
+            width: 736px;
+            height: 68px;
+            top: 10px;
+            left: 100px;
+        }
+
+        /* Rectangle styl */
+        .rectangle {
+            box-sizing: border-box;
+            position: absolute;
+            width: 396px;
+            height: 131px;
+            background: rgba(203, 32, 60, 0.08);
+            border: 5px solid #CB203C;
+            box-shadow: 0px -1px 0px #CB203C;
+            border-radius: 100px;
         }
 
         /* Kontener dla streamu i czatu */
@@ -150,13 +190,6 @@
             border-radius: 10px;
         }
 
-        /* Komunikaty o braku streamów */
-        #streamList p {
-            font-size: 1.5em;
-            color: #e53e3e;
-            text-align: center;
-        }
-
         /* Przycisk do chowania */
         .toggle-sidebar {
             position: absolute;
@@ -164,7 +197,7 @@
             left: 20px;
             background-color: #1e1e1e;
             border: none;
-            color: #e5e5e;
+            color: #e5e5e5;
             padding: 10px;
             cursor: pointer;
             border-radius: 5px;
@@ -186,31 +219,30 @@
             padding: 10px;
             font-size: 1.2em;
         }
-
     </style>
 </head>
 <body>
-<center>
-<img src="zdjecie.png" width="100px" alt="Logo">
-</center>
-<div class="main-container">
-    <!-- Panel boczny -->
-    <div id="sidebar" class="sidebar">
-        <!-- Lista streamów będzie tutaj dynamicznie dodawana -->
+    <center>
+        <img src="zdjecie.png" width="100px" alt="">
+    </center>
+    <div class="main-container">
+        <!-- Panel boczny -->
+        <div id="sidebar" class="sidebar">
+            <!-- Lista streamów będzie tutaj dynamicznie dodawana -->
+        </div>
+
+        <!-- Kontener na stream i czat -->
+        <div class="main-content">
+            <iframe id="streamViewer" src="" title="Stream" frameborder="0"></iframe>
+            <iframe id="chatViewer" src="" title="Chat" frameborder="0"></iframe>
+        </div>
     </div>
 
-    <!-- Kontener na stream i czat -->
-    <div class="main-content">
-        <iframe id="streamViewer" src="" title="Stream" frameborder="0"></iframe>
-        <iframe id="chatViewer" src="" title="Chat" frameborder="0"></iframe>
-    </div>
-</div>
+    <!-- Przycisk do chowania/zamykania panelu bocznego -->
+    <button class="toggle-sidebar" onclick="toggleSidebar()">⬅</button>
 
-<!-- Przycisk do chowania/zamykania panelu bocznego -->
-<button class="toggle-sidebar" onclick="toggleSidebar()">⬅</button>
-
-<script>
-// Twitch API credentials
+    <script>
+        // Twitch API credentials
 const clientId = 'ffo830okw5x9tcbt51c2wpjhr80jnn';
 const oauthToken = 'sh4ly28ldx12keykw0iedo0y5ellu9';
 const gameId = '32982';
@@ -270,54 +302,73 @@ async function getStreams(cursor = '') {
                 streamSidebarItem.onclick = () => openStream(stream.user_name);
 
                 const profileImageUrl = stream.thumbnail_url.replace('{width}', '100').replace('{height}', '100');
+                const viewerBadge = stream.viewer_count > 1000 ? `<span class="viewer-badge"></span>` : '';
+                const viewerCount = `<span class="viewer-count">${stream.viewer_count}</span>`;
+
                 streamSidebarItem.innerHTML = `
                     <img src="${profileImageUrl}" alt="${stream.user_name}">
                     <div class="info">
                         <strong>${stream.user_name}</strong>
-                        <p><span class="viewer-badge"></span>${stream.viewer_count}</p>
+                        <p><span class="viewer-badge"></span>${stream.viewer_count} widzów</p>
                     </div>
                 `;
-
                 sidebar.appendChild(streamSidebarItem);
             });
 
             if (data.pagination && data.pagination.cursor) {
-                cursor = data.pagination.cursor;
-                hasMoreStreams = true;
+                getStreams(data.pagination.cursor);
             } else {
                 hasMoreStreams = false;
             }
         } else {
             if (!cursor) {
-                document.getElementById('streamList').innerHTML = '<p>Brak dostępnych streamów.</p>';
+                document.getElementById('streamList').innerHTML = '<p>Brak streamów w tej chwili.</p>';
             }
-            hasMoreStreams = false;
         }
     } catch (error) {
-        console.error('Błąd:', error);
+        console.error('Wystąpił błąd:', error);
         document.getElementById('streamList').innerHTML = '<p>Wystąpił błąd podczas pobierania streamów.</p>';
     } finally {
         isLoading = false;
     }
 }
 
-function openStream(userName) {
-    const streamUrl = `https://player.twitch.tv/?channel=${userName}&parent=sqlnot.github.io&parent=player.twitch.tv`;
-    const chatUrl = `https://www.twitch.tv/embed/${userName}/chat?parent=sqlnot.github.io&parent=player.twitch.tv`;
+// Funkcja otwierająca stream w centralnej części ekranu
+function openStream(username) {
+    const iframe = document.getElementById('streamViewer');
+    const chatIframe = document.getElementById('chatViewer');
 
-    document.getElementById('streamViewer').src = streamUrl;
-    document.getElementById('chatViewer').src = chatUrl;
+    iframe.src = `https://player.twitch.tv/?channel=${username}&parent=sqlnot.github.io&autoplay=true`;
+    chatIframe.src = `https://www.twitch.tv/embed/${username}/chat?parent=sqlnot.github.io&theme=dark`;
 }
 
 function toggleSidebar() {
     const sidebar = document.getElementById('sidebar');
+    const button = document.querySelector('.toggle-sidebar');
     sidebar.classList.toggle('collapsed');
+    const isCollapsed = sidebar.classList.contains('collapsed');
+
+    // Zmiana szerokości głównej sekcji po zwinięciu panelu
     const mainContent = document.querySelector('.main-content');
-    mainContent.style.width = sidebar.classList.contains('collapsed') ? 'calc(100% - 80px)' : 'calc(100% - 200px)';
+    const streamViewer = document.getElementById('streamViewer');
+    const chatViewer = document.getElementById('chatViewer');
+
+    if (isCollapsed) {
+        // Zmniejszenie panelu czatu, powiększenie streamu
+        mainContent.style.width = 'calc(100% - 80px)';
+        streamViewer.style.width = '85%';
+        chatViewer.style.width = '15%';
+        button.textContent = '➡';
+    } else {
+        // Przywrócenie standardowej szerokości
+        mainContent.style.width = 'calc(100% - 200px)';
+        streamViewer.style.width = '78%';
+        chatViewer.style.width = '20%';
+        button.textContent = '⬅';
+    }
 }
 
 getStreams();
-</script>
-
+    </script>
 </body>
 </html>
