@@ -55,108 +55,87 @@
 
         /* Kafelki streamów w panelu bocznym */
         .stream-sidebar-item {
-            background-color: #2b2b2b;
-            border-radius: 8px;
-            padding: 8px;
+            position: relative;
+            width: 396px;
+            height: 128px;
             margin-bottom: 10px;
             display: flex;
             align-items: center;
-            cursor: pointer;
-            transition: background-color 0.3s ease, transform 0.2s ease;
-            width: 100%;
-            box-sizing: border-box;
-            position: relative;
+            background: rgba(203, 32, 60, 0.08);
+            border: 5px solid #CB203C;
+            border-radius: 100px;
+            overflow: hidden;
+            box-shadow: 0px -1px 0px #CB203C;
         }
 
-        /* Avatar i info o streamie */
-        .stream-sidebar-item img {
+        /* Strzałka */
+        .stream-sidebar-item .arrow {
+            position: relative;
             width: 45px;
             height: 46px;
-            border-radius: 20px;
-            position: relative;
-            z-index: 1;
         }
 
-        /* Tytuł i informacje o liczbie widzów */
-        .info {
-            display: flex;
-            flex-direction: column;
-            margin-left: 10px;
-            flex-grow: 1;
-            text-align: left;
-        }
-
-        .info strong {
-            font-size: 0.9em;
-            color: #f1f1f1;
-        }
-
-        .info p {
-            font-size: 0.8em;
-            color: #bbb;
-            display: flex;
-            align-items: center;
-            margin: 0;
-            margin-top: 5px;
-        }
-
-        /* Czerwona lampka obok liczby widzów */
-        .viewer-badge {
-            width: 14px;
-            height: 14px;
-            border-radius: 50%;
-            background-color: #CB203C;
-            margin-right: 5px;
-            position: relative;
-            z-index: 2;
-        }
-
-        /* Liczba widzów */
-        .viewer-count {
-            font-size: 0.8em;
-            color: #f1f1f1;
-        }
-
-        /* Efekt czerwonego tła za awatarem */
-        .avatar-background {
+        /* Union-1 */
+        .union-1 {
             position: absolute;
             left: 25%;
             right: 25%;
             top: 29.17%;
             bottom: 29.17%;
+            background: #FFFFFF;
+        }
+
+        /* Rectangle 3 */
+        .rectangle-3 {
+            box-sizing: border-box;
+            width: 396px;
+            height: 131px;
+            border: 5px solid #CB203C;
+            border-radius: 100px;
+        }
+
+        /* Avatar osoby */
+        .stream-avatar {
+            position: absolute;
             width: 58px;
             height: 58px;
-            background-color: rgba(203, 32, 60, 0.08);
-            border: 5px solid #CB203C;
-            filter: blur(12.7px);
-            border-radius: 100px;
-            z-index: 0;
+            background: url(image.png);
+            border-radius: 20px;
+            margin-left: 10px;
         }
 
         /* Nick */
         .nick {
+            position: absolute;
+            left: 75px;
             font-family: 'Montserrat', sans-serif;
             font-weight: 600;
             font-size: 28px;
-            line-height: 34px;
             color: #FFFFFF;
-            position: absolute;
-            width: 736px;
-            height: 68px;
-            top: 10px;
-            left: 100px;
+            margin: 0;
+            width: 200px;
         }
 
-        /* Rectangle styl */
-        .rectangle {
-            box-sizing: border-box;
+        /* Czerwona kropka */
+        .red-dot {
             position: absolute;
-            width: 396px;
-            height: 131px;
-            background: rgba(203, 32, 60, 0.08);
-            border: 5px solid #CB203C;
-            box-shadow: 0px -1px 0px #CB203C;
-            border-radius: 100px;
+            width: 14px;
+            height: 14px;
+            background: #CB203C;
+            top: 50%;
+            left: 75%;
+            transform: translate(-50%, -50%);
+        }
+
+        /* Liczba widzów */
+        .viewer-count {
+            position: absolute;
+            left: 100px;
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 600;
+            font-size: 25px;
+            color: #FFFFFF;
+            margin-top: 15px;
         }
 
         /* Kontener dla streamu i czatu */
@@ -164,19 +143,19 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            gap: 10px; /* Odstęp między streamem a czatem */
-            width: calc(100% - 200px); /* Pomniejszenie o szerokość sidebar */
+            gap: 10px;
+            width: calc(100% - 200px);
             margin-left: auto;
             margin-right: auto;
             padding: 20px;
             box-sizing: border-box;
             background-color: #1e1e1e;
-            transition: width 0.3s ease; /* Płynna zmiana szerokości */
+            transition: width 0.3s ease;
         }
 
         /* Iframe dla streamu */
         #streamViewer {
-            width: 78%; /* Większa szerokość dla streamu */
+            width: 78%;
             height: 730px;
             border: none;
             border-radius: 10px;
@@ -184,7 +163,7 @@
 
         /* Iframe dla czatu */
         #chatViewer {
-            width: 20%; /* Węższa szerokość dla czatu */
+            width: 20%;
             height: 730px;
             border: none;
             border-radius: 10px;
@@ -207,42 +186,28 @@
         .toggle-sidebar:hover {
             background-color: #444;
         }
-
-        /* Przycisk w stanie zwiniętym */
-        .sidebar.collapsed + .toggle-sidebar {
-            padding: 15px;
-            font-size: 1.5em;
-        }
-
-        /* Zmniejszenie przycisku przy większym panelu */
-        .sidebar:not(.collapsed) + .toggle-sidebar {
-            padding: 10px;
-            font-size: 1.2em;
-        }
     </style>
 </head>
 <body>
-    <center>
-        <img src="zdjecie.png" width="100px" alt="">
-    </center>
-    <div class="main-container">
-        <!-- Panel boczny -->
-        <div id="sidebar" class="sidebar">
-            <!-- Lista streamów będzie tutaj dynamicznie dodawana -->
-        </div>
-
-        <!-- Kontener na stream i czat -->
-        <div class="main-content">
-            <iframe id="streamViewer" src="" title="Stream" frameborder="0"></iframe>
-            <iframe id="chatViewer" src="" title="Chat" frameborder="0"></iframe>
-        </div>
+<center>
+    <img src="zdjecie.png" width="100px" alt="">
+</center>
+<div class="main-container">
+    <div id="sidebar" class="sidebar">
+        <!-- Lista streamów będzie tutaj dynamicznie dodawana -->
     </div>
 
-    <!-- Przycisk do chowania/zamykania panelu bocznego -->
-    <button class="toggle-sidebar" onclick="toggleSidebar()">⬅</button>
+    <!-- Kontener na stream i czat -->
+    <div class="main-content">
+        <iframe id="streamViewer" src="" title="Stream" frameborder="0"></iframe>
+        <iframe id="chatViewer" src="" title="Chat" frameborder="0"></iframe>
+    </div>
+</div>
 
-    <script>
-        // Twitch API credentials
+<button class="toggle-sidebar" onclick="toggleSidebar()">⬅</button>
+
+<script>
+    // Twitch API credentials
 const clientId = 'ffo830okw5x9tcbt51c2wpjhr80jnn';
 const oauthToken = 'sh4ly28ldx12keykw0iedo0y5ellu9';
 const gameId = '32982';
@@ -369,6 +334,6 @@ function toggleSidebar() {
 }
 
 getStreams();
-    </script>
+</script>
 </body>
 </html>
